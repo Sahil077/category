@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/styles.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/9171275aa1.js" crossorigin="anonymous"></script>
+
+
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-light" style="margin-bottom: 24px !important;">
+      <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link active" aria-current="page" href="/categories/admin/<%= adminId %>">Home</a>
+            <a class="nav-link" href="/admin/newfeature/<%= adminId %>">Add features</a>
+            <a class="nav-link" href="/adminLogout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+      <!-- Drop Down Section -->
+    <section id="tech_role_selection">
+      <p style="text-align: center;">Job Role</p>
+      <div class="rolecontent" >
+        <select class="custom-select form-control" id="techValue" onchange="techValue()"> 
+          <option selected>Select category</option>
+          <%  techList.forEach(function(tech_category){ %>   
+          <option value="<%= tech_category %>"><%= tech_category %></option>
+          <% }) %>
+        </select>
+      </div>
+    </section>
+
+    <!-- Question & tags sections -->
+    <section id="question_tags_selection">
+        <!-- <div class="container"> -->
+            <div class="row">
+              <div class="col tags_div" style="margin-right: 10px !important">
+                <div class="card" >
+                    <p class="select_Category" style="text-align: center!important;">Tags</p>
+                    <div class="card-body">
+                      <ul class="tags">
+                      </ul>
+                    </div>
+                  </div>
+              </div>
+              <div class="col tags_div" style="margin-left: 10px !important">
+                <div class="card" >
+                    <p class="select_Category" style="text-align: center!important;">Questions</p>
+                    <div class="card-body question_section">
+                      
+                    </div>
+                  </div>
+              </div>
+            </div>
+          <!-- </div> -->
+    </section>
+
+        <!-- ANSWER MODAL -->
+    <!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="answerCard" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p id="answer_value"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="close_answer()" >Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  </body>
+</html>

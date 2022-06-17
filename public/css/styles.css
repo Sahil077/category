@@ -1,0 +1,143 @@
+
+.tags {
+    list-style: none;
+    margin: 0;
+    overflow: hidden; 
+    padding: 0;
+  }
+  
+  .tags li {
+    float: left; 
+  }
+  
+  .tag {
+    background: #e3edf9;
+    color: #000000;
+    display: inline-block;
+    height: 29px;
+    line-height: 26px;
+    padding: 0px 6px 0px 6px;
+    /* position: relative; */
+    margin: 0px 8px 10px 0px;
+    text-decoration: none;
+    border-radius: 20% !important;
+    /* border-width: 20px !important;
+    border-color: black !important; */
+  }
+  
+  /* .tag::before {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: inset 0 1px rgba(0, 0, 0, 0.25);
+    content: '';
+    height: 6px;
+    left: 10px;
+    position: absolute;
+    width: 6px;
+    top: 10px;
+  } */
+  
+  /* .tag::after {
+    background: #fff;
+    border-bottom: 13px solid transparent;
+    border-left: 10px solid #eee;
+    border-top: 13px solid transparent;
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+  } */
+  
+ 
+  .tag:hover {
+    /* color: #8aa9c6; */
+    background-color: #8fb1c8;
+    border-color: transparent;
+}
+  
+  /* .tag:hover::after {
+     border-left-color: crimson; 
+  } */
+
+  input[type="date"] {
+    
+    position: relative;
+
+}
+
+.fas {
+  cursor: pointer;
+}
+
+.question_block{
+  cursor: pointer; 
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background: transparent;
+    bottom: 0;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+}
+
+.tech_heading {
+  left: 20px;
+  position: relative;
+  top: 8px;
+}
+
+.role_heading {
+  left: 35px;
+  position: relative;
+  top: 8px;
+}
+
+.modal {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rolecontent{
+  
+  max-width: 30%;
+  /* display: flex; */
+  position: relative;
+  left: 338px;
+  margin-bottom: 31px;
+}
+
+#tech_role_selection{
+  margin-top: 8px;
+}
+
+@media only screen and (max-width: 600px) {
+  .rolecontent{
+    max-width: 60%;
+    /* display: flex; */
+    position: relative;
+    left: 82px;
+    margin-bottom: 31px;
+  }
+  .tags_div{
+    margin: 8px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .rolecontent{
+    max-width: 30%;
+    /* display: flex; */
+    position: relative;
+    left: 542px;
+    margin-bottom: 31px;
+  }
+  
+}

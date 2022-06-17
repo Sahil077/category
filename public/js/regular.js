@@ -1,0 +1,105 @@
+const techValue = () => {
+    const category_value = document.getElementById('techValue').value
+    // console.log(category_value)
+    $('.question_section').empty(); 
+    $('.tags').empty();
+    let url = `http://localhost:3000/categoryName/${category_value}`
+    $.ajax({
+      type: 'GET',
+      url: url,
+      success:function(output) {
+       if(output.length > 0){
+          var str = ""
+          var tags_str = ""
+          for(var i= 0 ; i< output.length ; i++) {
+            str += `<div class="row mb-4 edit_div">
+                        <div class="form-group col-12 question_block" id="${output[i]._id}">
+                            ${output[i].question} 
+                        </div>   
+                      </div>`
+              for(var j =0 ; j < (output[i].tags).length; j++){
+                tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
+              }
+          
+          }
+          $('.question_section').append(str)
+          $('.tags').append(tags_str)
+          $('.select_Category').hide()
+          // console.log(str)
+        }else{
+          $('.select_Category').show()
+          $('.question_section .row').hide()
+        }
+      },
+      error:function(err) {
+        console.log(err)
+         }
+      });  
+  }
+
+
+  $('.tags').on('click', function (event) {
+    const tag_val = event.target;
+    var css_id = (tag_val.id)
+    var split_id = (tag_val.id).split('_')[0]
+    // before
+    $('.tag').css('background-color', '#e3edf9');
+    // after
+    $('#'+ css_id).css('background-color', '#8aa9c6');
+    let url = `http://localhost:3000/tags/${split_id}`
+    $.ajax({
+      type: 'GET',
+      url: url,
+      success:function(output) {
+      //  console.log(output);
+       $('.question_section').empty();
+  
+       if(output.length > 0){
+        var str = ""
+        for(var i= 0 ; i< output.length ; i++) {
+          str += `<div class="row mb-4 edit_div">
+                      <div class="form-group col-10 question_block" id="${output[i]._id}">
+                          ${output[i].question} 
+                      </div>
+                    </div>`
+        }
+        $('.question_section').append(str)
+        $('.select_Category').hide()
+        // console.log(str)
+      }
+  
+      },
+      error:function(err) {
+        console.log(err)
+         }
+      });
+  })
+
+
+
+
+  $('.question_section').on('click', function (event) {
+    const tag_val = event.target;
+    // console.log(tag_val.id)
+
+    let url = `http://localhost:3000/categoryID/${tag_val.id}`
+    $.ajax({
+      type: 'GET',
+      url: url,
+      success:function(output) {
+        if(output.answer == ''){
+          $('#answer_value').text('No answer given')
+        }else{
+          $('#answer_value').text(output.answer)
+        }
+       $('#answerCard').modal('show');
+      },
+      error:function(err) {
+        console.log(err)
+         }
+      });
+  })
+
+  const close_answer = () => {
+    $('#answerCard').modal('hide');
+  }
