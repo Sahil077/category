@@ -41,12 +41,12 @@ var sessions;
 var adminUsername ;
 /*  Google AUTH  */
 
-const GOOGLE_CLIENT_ID = '1002319268932-43rdd373jooekh1o8obcm4jfodmas0dc.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = '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';
+const GOOGLE_CLIENT_ID = '65610686925-2eqfqm5irgfu4t0jf1pmjo150i884mb6.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/auth/google/callback",
+        callbackURL: "https://interviewhelp.me/auth/google/callback",
         scope: ['profile', 'email'],
     },
     function (accessToken, refreshToken, profile, done) {
