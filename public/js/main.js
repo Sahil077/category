@@ -7,7 +7,7 @@ const techValue = () => {
   $('.question_section').empty();
   $('.tags').empty();
   // let url = `https://intadmin.herokuapp.com/categoryName/${category_value}`
-  let url = `http://localhost:3000/categoryName/${adminID}/${category_value}`
+  let url = `https://interviewhelp.me/categoryName/${adminID}/${category_value}`
   $.ajax({
     type: 'GET',
     url: url,
@@ -68,12 +68,12 @@ $('.question_section').on('click', function (event) {
 const editQuestion = (targetElement) => {
   console.log(targetElement)
   const adminID = (window.location.href).split('admin/')[1]
-  window.open(`http://localhost:3000/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
+  window.open(`https://interviewhelp.me/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
 }
 
 const deleteQuestion = (targetElement) => {
 
-  let url = `http://localhost:3000/categoryID/${targetElement}`
+  let url = `https://interviewhelp.me/categoryID/${targetElement}`
   $.ajax({
     type: 'DELETE',
     url: url,
@@ -96,7 +96,7 @@ $('.tags').on('click', function (event) {
   $('.tag').css('background-color', '#e3edf9');
   // after
   $('#'+ css_id).css('background-color', '#8aa9c6');
-  let url = `http://localhost:3000/${adminID}/tags/${split_id}`
+  let url = `https://interviewhelp.me/${adminID}/tags/${split_id}`
   console.log(url)
   $.ajax({
     type: 'GET',
@@ -144,7 +144,7 @@ const update_category = (id_val) => {
   var answer = $('#answer').val()
   var tags = $('#tags').val()
   // let url = `https://intadmin.herokuapp.com/categoryID/${adminID}/${id_val}`
-  let url = `http://localhost:3000/categoryID/${id_val}`
+  let url = `https://interviewhelp.me/categoryID/${id_val}`
  
   $.ajax({
     type: 'PUT',
@@ -158,7 +158,7 @@ const update_category = (id_val) => {
     }),
     success:function(output) {
      console.log(output);
-     window.open(`http://localhost:3000/categories/admin/${adminUserid}`,"_self")
+     window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`,"_self")
     },
     error:function(err) {
       console.log(err)
