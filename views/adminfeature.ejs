@@ -6,8 +6,16 @@
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/styles.css">
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+    tinymce.init({
+        selector: '#myTextarea',
+        width: '100%',
+        height: 324
+    });
+    </script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-light" style="margin-bottom: 24px !important;">
@@ -37,13 +45,16 @@
                   <input type="text" class="form-control" value="<%= updateValue.category_name == '' ? '' : updateValue.category_name  %>" id="category_name" name="category_name" required>
                 </div>
                 <% }%>
-                <input type="text" value="<%= adminId %>" name="adminId">
+               
+                <input type="hidden" value="<%= adminId %>" name="adminId">
                 <div class="mb-3">
                   <label class="form-label">Question</label>
                   <input type="text" value="<%= updateValue.question == '' ? '' : updateValue.question  %>" class="form-control" id="question" name="question">
                 </div>
+    
                 <div class="mb-3">
                     <label class="form-label">Answer</label>
+                    <textarea name="myTextarea" id="myTextarea"></textarea>
                     <input type="text" value="<%= updateValue.answer == '' ? '' : updateValue.answer  %>" class="form-control" id="answer" name="answer">
                   </div>
                   <div class="mb-3">
@@ -64,10 +75,12 @@
                   <% } %>
                
               </form>
+             
         </div>
     </section>
 
     <script src="/js/main.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
   </body>
 </html>
