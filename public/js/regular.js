@@ -3,7 +3,7 @@ const techValue = () => {
     // console.log(category_value)
     $('.question_section').empty(); 
     $('.tags').empty();
-    let url = `http://localhost:3000/categoryName/${category_value}`
+    let url = `https://interviewhelp.me/categoryName/${category_value}`
     $.ajax({
       type: 'GET',
       url: url,
@@ -46,7 +46,7 @@ const techValue = () => {
     $('.tag').css('background-color', '#e3edf9');
     // after
     $('#'+ css_id).css('background-color', '#8aa9c6');
-    let url = `http://localhost:3000/tags/${split_id}`
+    let url = `https://interviewhelp.me/tags/${split_id}`
     $.ajax({
       type: 'GET',
       url: url,
@@ -82,7 +82,7 @@ const techValue = () => {
     const tag_val = event.target;
     // console.log(tag_val.id)
 
-    let url = `http://localhost:3000/categoryID/${tag_val.id}`
+    let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
     $.ajax({
       type: 'GET',
       url: url,
