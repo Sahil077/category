@@ -8,11 +8,12 @@ const techValue = () => {
   $('.tags').empty();
   // let url = `https://intadmin.herokuapp.com/categoryName/${category_value}`
   let url = `https://interviewhelp.me/categoryName/${adminID}/${category_value}`
+  // let url = `http://localhost:3000/categoryName/${adminID}/${category_value}`
   $.ajax({
     type: 'GET',
     url: url,
     success:function(output) {
-    //  console.log(output);
+     console.log(output);
      if(output.length > 0){
         var str = ""
         var tags_str = ""
@@ -69,6 +70,7 @@ const editQuestion = (targetElement) => {
   console.log(targetElement)
   const adminID = (window.location.href).split('admin/')[1]
   window.open(`https://interviewhelp.me/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
+  // window.open(`http://localhost:3000/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
 }
 
 const deleteQuestion = (targetElement) => {
@@ -138,13 +140,14 @@ const update_category = (id_val) => {
   // console.log(id_val)
   const adminID = (window.location.href).split('adminId/')[1]
   const adminUserid = adminID.split('/')[0]
-  // console.log(adminUserid)
+  var myContent = tinymce.get("myTextarea").getContent();
+  console.log('update = ' + myContent)
   var category_name = $('#category_name').val()
   var question = $('#question').val()
-  var answer = $('#answer').val()
   var tags = $('#tags').val()
   // let url = `https://intadmin.herokuapp.com/categoryID/${adminID}/${id_val}`
   let url = `https://interviewhelp.me/categoryID/${id_val}`
+  // let url = `http://localhost:3000/categoryID/${id_val}`
  
   $.ajax({
     type: 'PUT',
@@ -153,12 +156,13 @@ const update_category = (id_val) => {
     data : JSON.stringify({
       category_name:category_name,
       question:question,
-      answer:answer,
+      answer:myContent,
       tags:tags
     }),
     success:function(output) {
      console.log(output);
-     window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`,"_self")
+    //  window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`,"_self")
+    // window.open(`http://localhost:3000/categories/admin/${adminUserid}`,"_self")
     },
     error:function(err) {
       console.log(err)
@@ -170,9 +174,10 @@ const update_category = (id_val) => {
 
 $('.question_section').on('click', function (event) {
   const tag_val = event.target;
-  console.log(tag_val)
-
-  let url = `https://intadmin.herokuapp.com/categoryID/${tag_val.id}`
+  // console.log(tag_val)
+  $('#modal-body').empty(); 
+  // let url = `https://intadmin.herokuapp.com/categoryID/${tag_val.id}`
+  let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
   $.ajax({
     type: 'GET',
     url: url,
@@ -180,7 +185,7 @@ $('.question_section').on('click', function (event) {
       if(output.answer == ''){
         $('#answer_value').text('No answer given')
       }else{
-        $('#answer_value').text(output.answer)
+        $("#modal-body").append(output.answer)
       }
      $('#answerCard').modal('show');
     },
