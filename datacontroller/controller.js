@@ -46,7 +46,7 @@ const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "/auth/google/callback",
+        callbackURL: "https://interviewhelp.me/auth/google/callback",
         scope: ['profile', 'email'],
     },
     function (accessToken, refreshToken, profile, done) {
@@ -291,6 +291,7 @@ module.exports = function (app) {
 
     // Create category
     app.post('/create/category', (req, res) => {
+        // console.log((req.body.myTextarea).toString())
         var tags = []
         var tags_list = (req.body.tags).split(",")
         for (var tag = 0; tag < tags_list.length; tag++) {
@@ -300,7 +301,7 @@ module.exports = function (app) {
         new categories({
             category_name: req.body.category_name,
             question: req.body.question,
-            answer: req.body.answer,
+            answer: (req.body.myTextarea).toString(),
             tags: tags,
             created_at: req.body.date,
             adminId: req.body.adminId
@@ -369,7 +370,7 @@ module.exports = function (app) {
     })
 
     app.put('/categoryID/:id', (req, res) => {
-
+        console.log((req.body))
         var tags = []
         if (req.body.tags) {
             var tags_list = (req.body.tags).split(",")
@@ -382,7 +383,7 @@ module.exports = function (app) {
             }, {
                 $set: {
                     question: req.body.question,
-                    answer: req.body.answer,
+                    answer: (req.body.answer).toString(),
                     tags: tags
                 }
             }).then(updateCategory =>
