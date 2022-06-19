@@ -62,7 +62,7 @@ module.exports = function (app) {
             scope: ['profile', 'email']
         }));
 
-    app.get('https://interviewhelp.me/auth/google/callback',
+    app.get('/auth/google/callback',
         passport.authenticate('google', {
             failureRedirect: '/error'
         }),
