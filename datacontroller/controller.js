@@ -29,11 +29,11 @@ const adminSchema = new mongoose.Schema({
 const adminLogin = mongoose.model("adminLogin", adminSchema);
 
 passport.serializeUser(function (user, cb) {
-    cb(null, user);
+    cb(null, user.id);
 });
 
 passport.deserializeUser(function (obj, cb) {
-    cb(null, obj);
+    cb(null, obj.id);
 });
 
 var userProfile;
