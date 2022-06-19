@@ -109,11 +109,16 @@ module.exports = function (app) {
 
     // Get single Category by ID
     app.get('/categoryID/:id', (req, res) => {
-
+        console.log(req.params.id)
         categories.findOne({
             _id: req.params.id
         }).
         then(updateCategory =>
+            
+            console.log(updateCategory)
+            )
+            then(updateCategory =>
+            
                 res.json(updateCategory)
             )
             .catch(err => {
