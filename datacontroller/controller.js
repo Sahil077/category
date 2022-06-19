@@ -44,8 +44,8 @@ var adminUsername ;
 const GOOGLE_CLIENT_ID = '578796287402-9t9o4ala23upg96t426lim763qm4r9qj.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
-        clientID: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET,
+        clientID: '578796287402-9t9o4ala23upg96t426lim763qm4r9qj.apps.googleusercontent.com',
+        clientSecret: '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',
         callbackURL: "https://interviewhelp.me/auth/google/callback",
         scope: ['profile', 'email'],
     },
