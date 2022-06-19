@@ -38,7 +38,7 @@ passport.deserializeUser(function (obj, cb) {
 
 var userProfile;
 var sessions;
-var adminUsername ;
+var adminUsername;
 /*  Google AUTH  */
 
 const GOOGLE_CLIENT_ID = '65610686925-bko50g7l2c7hrkqqcpvadi3hitv6ito3.apps.googleusercontent.com';
@@ -114,11 +114,11 @@ module.exports = function (app) {
             _id: req.params.id
         }).
         then(updateCategory =>
-            
+
             console.log(updateCategory)
-            )
-            then(updateCategory =>
-            
+        ).
+        then(updateCategory =>
+
                 res.json(updateCategory)
             )
             .catch(err => {
@@ -275,7 +275,7 @@ module.exports = function (app) {
     app.get('/categories/admin/:adminId', (req, res) => {
         const tech_list = [];
         console.log(adminUsername)
-        if(adminUsername){
+        if (adminUsername) {
             categories.find({
                 adminId: req.params.adminId
             }, (err, data) => {
@@ -289,9 +289,9 @@ module.exports = function (app) {
                     adminId: req.params.adminId
                 })
             })
-        } else{
+        } else {
             res.render("adminloginPage")
-        }  
+        }
     })
 
     // Create category
@@ -322,54 +322,54 @@ module.exports = function (app) {
     // Get Categories by Name
     app.get('/categoryName/:adminId/:category_name', (req, res) => {
         console.log(adminUsername)
-        if(adminUsername){
-        categories.aggregate(
-            [{
-                $match: {
-                    'category_name': req.params.category_name,
-                    'adminId': req.params.adminId
-                }
-            }]
-        ).
-        then(updateCategory =>
-                res.json(updateCategory)
-            )
-            .catch(err => {
-                res.json(err)
-            })
-        }else{
+        if (adminUsername) {
+            categories.aggregate(
+                [{
+                    $match: {
+                        'category_name': req.params.category_name,
+                        'adminId': req.params.adminId
+                    }
+                }]
+            ).
+            then(updateCategory =>
+                    res.json(updateCategory)
+                )
+                .catch(err => {
+                    res.json(err)
+                })
+        } else {
             res.render("adminloginPage")
         }
     })
 
     app.get("/admin/newfeature/:adminId", function (req, res) {
         console.log(adminUsername)
-        if(adminUsername){
-        res.render('adminfeature', {
-            updateValue: "",
-            adminId: req.params.adminId
-        });
-        }else{
+        if (adminUsername) {
+            res.render('adminfeature', {
+                updateValue: "",
+                adminId: req.params.adminId
+            });
+        } else {
             res.render("adminloginPage")
         }
     });
 
     app.get("/admin/feature/adminId/:adminId/updateID/:updateID", function (req, res) {
         console.log(adminUsername)
-        if(adminUsername){
-        categories.findOne({
-            _id: req.params.updateID
-        }).
-        then(updateCategory =>
-                res.render('adminfeature', {
-                    updateValue: updateCategory,
-                    adminId:req.params.adminId
+        if (adminUsername) {
+            categories.findOne({
+                _id: req.params.updateID
+            }).
+            then(updateCategory =>
+                    res.render('adminfeature', {
+                        updateValue: updateCategory,
+                        adminId: req.params.adminId
+                    })
+                )
+                .catch(err => {
+                    res.json(err)
                 })
-            )
-            .catch(err => {
-                res.json(err)
-            })
-        }else{
+        } else {
             res.render("adminloginPage")
         }
     })
@@ -404,27 +404,27 @@ module.exports = function (app) {
         var tagName = req.params.tag
         var adminID = req.params.adminID
         console.log(adminUsername)
-        if(adminUsername){
-        categories.aggregate(
-            [{
-                $match: {
-                    tags: tagName,
-                    adminId: adminID
-                }
-            }]
-        ).
-        then(data =>
-                res.json(data)
-            )
-            .catch(err => {
-                res.json(err)
-            })
-        }else{
+        if (adminUsername) {
+            categories.aggregate(
+                [{
+                    $match: {
+                        tags: tagName,
+                        adminId: adminID
+                    }
+                }]
+            ).
+            then(data =>
+                    res.json(data)
+                )
+                .catch(err => {
+                    res.json(err)
+                })
+        } else {
             res.render("adminloginPage")
         }
     })
 
-    
+
     // DELETE CATEGORY BY ID
     app.delete('/categoryID/:id', (req, res) => {
         console.log(adminUsername)
@@ -438,7 +438,7 @@ module.exports = function (app) {
             })
     })
 
-    app.get('/adminLogout',(req,res) => {
+    app.get('/adminLogout', (req, res) => {
         adminUsername = ""
         res.render('adminloginPage')
     })
