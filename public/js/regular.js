@@ -81,7 +81,7 @@ const techValue = () => {
   $('.question_section').on('click', function (event) {
     const tag_val = event.target;
     // console.log(tag_val.id)
-
+    $('#modal-body').empty(); 
     let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
     $.ajax({
       type: 'GET',
@@ -90,7 +90,7 @@ const techValue = () => {
         if(output.answer == ''){
           $('#answer_value').text('No answer given')
         }else{
-          $('#answer_value').text(output.answer)
+          $("#modal-body").append(output.answer)
         }
        $('#answerCard').modal('show');
       },
