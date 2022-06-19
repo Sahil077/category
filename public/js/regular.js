@@ -91,6 +91,7 @@ const techValue = () => {
         if(output.answer == ''){
           $('#answer_value').text('No answer given')
         }else{
+          console.log('OUTPUT ANSWER = ' + output.answer)
           $("#modal-body").append(output.answer)
         }
        $('#answerCard').modal('show');
