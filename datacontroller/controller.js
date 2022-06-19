@@ -41,8 +41,8 @@ var sessions;
 var adminUsername ;
 /*  Google AUTH  */
 
-const GOOGLE_CLIENT_ID = '65610686925-2eqfqm5irgfu4t0jf1pmjo150i884mb6.apps.googleusercontent.com';
-const GOOGLE_CLIENT_SECRET = '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';
+const GOOGLE_CLIENT_ID = '578796287402-9t9o4ala23upg96t426lim763qm4r9qj.apps.googleusercontent.com';
+const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
