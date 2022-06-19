@@ -161,7 +161,7 @@ const update_category = (id_val) => {
     }),
     success:function(output) {
      console.log(output);
-    //  window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`,"_self")
+     window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`,"_self")
     // window.open(`http://localhost:3000/categories/admin/${adminUserid}`,"_self")
     },
     error:function(err) {
@@ -174,14 +174,15 @@ const update_category = (id_val) => {
 
 $('.question_section').on('click', function (event) {
   const tag_val = event.target;
-  // console.log(tag_val)
+  console.log(tag_val.id)
   $('#modal-body').empty(); 
-  // let url = `https://intadmin.herokuapp.com/categoryID/${tag_val.id}`
   let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
+  console.log(url)
   $.ajax({
     type: 'GET',
     url: url,
     success:function(output) {
+      console.log('categoryID API SUCCESS')
       if(output.answer == ''){
         $('#answer_value').text('No answer given')
       }else{
@@ -190,6 +191,7 @@ $('.question_section').on('click', function (event) {
      $('#answerCard').modal('show');
     },
     error:function(err) {
+      console.log('categoryID API HIT ERR')
       console.log(err)
        }
     });
