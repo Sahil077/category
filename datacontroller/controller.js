@@ -46,7 +46,7 @@ const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
-        callbackURL: "https://interviewhelp.me/auth/google/callback",
+        callbackURL: "/auth/google/callback",
         scope: ['profile', 'email'],
     },
     function (accessToken, refreshToken, profile, done) {
