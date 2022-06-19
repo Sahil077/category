@@ -80,13 +80,14 @@ const techValue = () => {
 
   $('.question_section').on('click', function (event) {
     const tag_val = event.target;
-    // console.log(tag_val.id)
+    console.log(tag_val.id)
     $('#modal-body').empty(); 
     let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
     $.ajax({
       type: 'GET',
       url: url,
       success:function(output) {
+        console.log(output)
         if(output.answer == ''){
           $('#answer_value').text('No answer given')
         }else{
