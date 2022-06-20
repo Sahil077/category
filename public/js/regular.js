@@ -26,7 +26,8 @@ const techValue = () => {
           console.log(sorted_tags)
           const tag_name = Array.from(new Set(sorted_tags));
           console.log(tag_name)
-          const ordered_tags = tag_name.sort()
+          const ordered_tags = tag_name.sort();
+          console.log(ordered_tags)
           for(var i= 0 ; i< ordered_tags.length ; i++) {
               var toShow = ordered_tags.split('_')[0]
               console.log(toShow)
