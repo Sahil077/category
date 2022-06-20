@@ -7,23 +7,30 @@ const techValue = () => {
     $.ajax({
       type: 'GET',
       url: url,
-      success:function(questionData , tagsValue) {
-        console.log('------- + ' + Object.keys(questionData))
-        console.log('------- + ' + Object.values(tagsValue))
-        console.log('------- + ' + JSON.stringify(questionData))
-        console.log('------- + ' + JSON.stringify(tagsValue))
-       if(questionData.length > 0){
+      success:function(output) {
+        const sorted_tags = []
+       if(output.length > 0){
           var str = ""
           var tags_str = ""
-          for(var i= 0 ; i< questionData.length ; i++) {
+          for(var i= 0 ; i< output.length ; i++) {
             str += `<div class="row mb-4 edit_div">
-                        <div class="form-group col-12 question_block" id="${questionData[i]._id}">
-                            ${questionData[i].question} 
+                        <div class="form-group col-12 question_block" id="${output[i]._id}">
+                            ${output[i].question} 
                         </div>   
-                      </div>` 
+                      </div>`
+              for(var j =0 ; j < (output[i].tags).length; j++){
+                sorted_tags.push(output[i].tags[j]+'_'+[j])
+                // tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
+              }
           }
-          for(var j =0 ; j < tagsValue.length; j++){
-            tags_str += `<li id= "${[j]}"><a class="tag" id= "${tagsValue[j]+'_'+[j]}">${tagsValue[j]}</a></li>`
+          console.log(sorted_tags)
+          const tag_name = Array.from(new Set(sorted_tags));
+          console.log(tag_names)
+          const ordered_tags = tag_name.sort()
+          for(var i= 0 ; i< ordered_tags.length ; i++) {
+              var toShow = ordered_tags.split('_')[0]
+              console.log(toShow)
+            tags_str += `<li><a class="tag" id= "${ordered_tags}">${toShow}</a></li>`
           }
           $('.question_section').append(str)
           $('.tags').append(tags_str)
