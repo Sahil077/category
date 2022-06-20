@@ -3,24 +3,24 @@ const techValue = () => {
     // console.log(category_value)
     $('.question_section').empty(); 
     $('.tags').empty();
-    let url = `https://interviewhelp.me/categoryName/${category_value}`
+    let url = `http://localhost:3000/categoryName/${category_value}`
     $.ajax({
       type: 'GET',
       url: url,
-      success:function(output) {
-       if(output.length > 0){
+      success:function(questionData , tagsValue) {
+        console.log('------- + ' + questionData)
+       if(questionData.length > 0){
           var str = ""
           var tags_str = ""
-          for(var i= 0 ; i< output.length ; i++) {
+          for(var i= 0 ; i< questionData.length ; i++) {
             str += `<div class="row mb-4 edit_div">
-                        <div class="form-group col-12 question_block" id="${output[i]._id}">
-                            ${output[i].question} 
+                        <div class="form-group col-12 question_block" id="${questionData[i]._id}">
+                            ${questionData[i].question} 
                         </div>   
-                      </div>`
-              for(var j =0 ; j < (output[i].tags).length; j++){
-                tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
-              }
-          
+                      </div>` 
+          }
+          for(var j =0 ; j < tagsValue.length; j++){
+            tags_str += `<li id= "${[j]}"><a class="tag" id= "${tagsValue[j]+'_'+[j]}">${tagsValue[j]}</a></li>`
           }
           $('.question_section').append(str)
           $('.tags').append(tags_str)
