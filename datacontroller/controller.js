@@ -95,34 +95,16 @@ module.exports = function (app) {
 
     // Get Categories by Name
     app.get('/categoryName/:category_name', (req, res) => {
-        const categoryData = []
-        const alph_tags = []
+
         categories.find({
             'category_name': req.params.category_name
-        },(err,data) =>{
-            if(err) throw err;
-            for(var i= 0 ; i< data.length ; i++) {
-                categoryData.push({
-                    _id:data[i]._id,
-                    question:data[i].question
-                })
-                for(var j =0 ; j < (data[i].tags).length; j++){
-                    alph_tags.push(data[i].tags[j])
-                }
-            }
-            var totalTags = Array.from(new Set(alph_tags));
-            var sortedTags = totalTags.sort()
-            console.log(categoryData)
-            res.json({questionData:categoryData , tagsValue:sortedTags})
-        })
-        
-        // .
-        // then(updateCategory =>
-        //         res.json(updateCategory)
-        //     )
-        //     .catch(err => {
-        //         res.json(err)
-        //     })
+        }).
+        then(updateCategory =>
+                res.json(updateCategory)
+            )
+            .catch(err => {
+                res.json(err)
+            })
     })
 
     // Get single Category by ID
