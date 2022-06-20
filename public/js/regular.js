@@ -29,7 +29,7 @@ const techValue = () => {
           const ordered_tags = tag_name.sort();
           console.log(ordered_tags)
           for(var i= 0 ; i< ordered_tags.length ; i++) {
-              var toShow = ordered_tags.split('_')[0]
+              var toShow = ordered_tags[i].split('_')[0]
               console.log(toShow)
             tags_str += `<li><a class="tag" id= "${ordered_tags}">${toShow}</a></li>`
           }
