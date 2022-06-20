@@ -3,12 +3,15 @@ const techValue = () => {
     // console.log(category_value)
     $('.question_section').empty(); 
     $('.tags').empty();
-    let url = `http://localhost:3000/categoryName/${category_value}`
+    let url = `https://interviewhelp.me/categoryName/${category_value}`
     $.ajax({
       type: 'GET',
       url: url,
       success:function(questionData , tagsValue) {
-        console.log('------- + ' + questionData)
+        console.log('------- + ' + Object.keys(questionData))
+        console.log('------- + ' + Object.values(tagsValue))
+        console.log('------- + ' + JSON.stringify(questionData))
+        console.log('------- + ' + JSON.stringify(tagsValue))
        if(questionData.length > 0){
           var str = ""
           var tags_str = ""
