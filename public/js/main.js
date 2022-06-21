@@ -95,8 +95,11 @@ const deleteQuestion = (targetElement) => {
 
 $('.tags').on('click', function (event) {
   const tag_val = event.target;
+  console.log('TAG_VAL = ' + tag_val)
   var css_id = (tag_val.id)
+  console.log('CSS_ID = ' + css_id)
   var split_id = (tag_val.id).split('_')[0]
+  console.log('SPLIT_ID = ' + split_id)
   const adminID = (window.location.href).split('admin/')[1]
   // before
   $('.tag').css('background-color', '#e3edf9');
