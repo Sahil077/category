@@ -1,5 +1,3 @@
-
-
 const techValue = () => {
   const category_value = document.getElementById('techValue').value
   const adminID = (window.location.href).split('admin/')[1]
@@ -12,43 +10,50 @@ const techValue = () => {
   $.ajax({
     type: 'GET',
     url: url,
-    success:function(output) {
+    success: function (output) {
+      console.log(output);
       const sorted_tags = []
-      if(output.length > 0){
-         var str = ""
-         var tags_str = ""
-         for(var i= 0 ; i< output.length ; i++) {
-           str += `<div class="row mb-4 edit_div">
-                       <div class="form-group col-12 question_block" id="${output[i]._id}">
-                           ${output[i].question} 
-                       </div>   
-                     </div>`
-             for(var j =0 ; j < (output[i].tags).length; j++){
-               sorted_tags.push(output[i].tags[j]+'_'+[j])
-             }
-         }
-         const tag_name = Array.from(new Set(sorted_tags));
-         const ordered_tags = tag_name.sort()
-         for(var i= 0 ; i< ordered_tags.length ; i++) {
-             var toShow = ordered_tags[i].split('_')[0]
-           tags_str += `<li><a class="tag" id= "${ordered_tags}">${toShow}</a></li>`
-         }
-         $('.question_section').append(str)
-         $('.tags').append(tags_str)
-         $('.select_Category').hide()
-         // console.log(str)
-       }else{
-         $('.select_Category').show()
-         $('.question_section .row').hide()
-       }
+      if (output.length > 0) {
+        var str = ""
+        var tags_str = ""
+        for (var i = 0; i < output.length; i++) {
+          var categoryId = (output[i]._id).toString()
+          // var edit_div = 'question_div' + [i]
+          str += `<div class="row mb-4 edit_div">
+                      <div class="form-group col-10 question_block" id="${output[i]._id}">
+                          ${output[i].question} 
+                      </div>
+                      <div class="form-group col-2">
+                          <i class="fas fa-edit edit-logo" id="${categoryId}"></i>
+                          <i class="fas fa-trash delete-logo" id="${categoryId}"></i>
+                      </div>   
+                    </div>`
+          for (var j = 0; j < (output[i].tags).length; j++) {
+            sorted_tags.push(output[i].tags[j] + '_' + [j])
+          }
+        }
+        const tag_name = Array.from(new Set(sorted_tags));
+        const ordered_tags = tag_name.sort()
+        for (var i = 0; i < ordered_tags.length; i++) {
+          var toShow = ordered_tags[i].split('_')[0]
+          tags_str += `<li><a class="tag" id="${ordered_tags}">${toShow}</a></li>`
+        }
+        $('.question_section').append(str)
+        $('.tags').append(tags_str)
+        $('.select_Category').hide()
+        // console.log(str)
+      } else {
+        $('.select_Category').show()
+        $('.question_section .row').hide()
+      }
     },
-    error:function(err) {
+    error: function (err) {
       console.log(err)
-       }
-    });
+    }
+  });
 
 
-  
+
 }
 
 
@@ -68,7 +73,7 @@ $('.question_section').on('click', function (event) {
 const editQuestion = (targetElement) => {
   console.log(targetElement)
   const adminID = (window.location.href).split('admin/')[1]
-  window.open(`https://interviewhelp.me/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
+  window.open(`https://interviewhelp.me/admin/feature/adminId/${adminID}/updateID/${targetElement}`, "_self");
   // window.open(`http://localhost:3000/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
 }
 
@@ -78,14 +83,14 @@ const deleteQuestion = (targetElement) => {
   $.ajax({
     type: 'DELETE',
     url: url,
-    success:function(output) {
-     console.log(output)
-     location.reload()
+    success: function (output) {
+      console.log(output)
+      location.reload()
     },
-    error:function(err) {
+    error: function (err) {
       console.log(err)
-       }
-    });
+    }
+  });
 }
 
 $('.tags').on('click', function (event) {
@@ -96,22 +101,22 @@ $('.tags').on('click', function (event) {
   // before
   $('.tag').css('background-color', '#e3edf9');
   // after
-  $('#'+ css_id).css('background-color', '#8aa9c6');
+  $('#' + css_id).css('background-color', '#8aa9c6');
   let url = `https://interviewhelp.me/${adminID}/tags/${split_id}`
   console.log(url)
   $.ajax({
     type: 'GET',
     url: url,
-    success:function(output) {
-    //  console.log(output);
-     $('.question_section').empty();
+    success: function (output) {
+      //  console.log(output);
+      $('.question_section').empty();
 
-     if(output.length > 0){
-      var str = ""
-      for(var i= 0 ; i< output.length ; i++) {
-        var categoryId = (output[i]._id).toString()
-        // var edit_div = 'question_div' + [i]
-        str += `<div class="row mb-4 edit_div">
+      if (output.length > 0) {
+        var str = ""
+        for (var i = 0; i < output.length; i++) {
+          var categoryId = (output[i]._id).toString()
+          // var edit_div = 'question_div' + [i]
+          str += `<div class="row mb-4 edit_div">
                     <div class="form-group col-10 question_block" id="${output[i]._id}">
                         ${output[i].question} 
                     </div>
@@ -120,17 +125,17 @@ $('.tags').on('click', function (event) {
                     <i class="fas fa-trash delete-logo" id="${categoryId}"></i>
                     </div>   
                   </div>`
+        }
+        $('.question_section').append(str)
+        $('.select_Category').hide()
+        // console.log(str)
       }
-      $('.question_section').append(str)
-      $('.select_Category').hide()
-      // console.log(str)
-    }
 
     },
-    error:function(err) {
+    error: function (err) {
       console.log(err)
-       }
-    });
+    }
+  });
 })
 
 // Update form
@@ -147,26 +152,26 @@ const update_category = (id_val) => {
   // let url = `https://intadmin.herokuapp.com/categoryID/${adminID}/${id_val}`
   let url = `https://interviewhelp.me/categoryID/${id_val}`
   // let url = `http://localhost:3000/categoryID/${id_val}`
- 
+
   $.ajax({
     type: 'PUT',
     url: url,
     contentType: "application/json",
-    data : JSON.stringify({
-      category_name:category_name,
-      question:question,
-      answer:myContent,
-      tags:tags
+    data: JSON.stringify({
+      category_name: category_name,
+      question: question,
+      answer: myContent,
+      tags: tags
     }),
-    success:function(output) {
-     console.log(output);
-     window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`,"_self")
-    // window.open(`http://localhost:3000/categories/admin/${adminUserid}`,"_self")
+    success: function (output) {
+      console.log(output);
+      window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`, "_self")
+      // window.open(`http://localhost:3000/categories/admin/${adminUserid}`,"_self")
     },
-    error:function(err) {
+    error: function (err) {
       console.log(err)
-       }
-    });
+    }
+  });
 
 }
 
@@ -174,26 +179,26 @@ const update_category = (id_val) => {
 $('.question_section').on('click', function (event) {
   const tag_val = event.target;
   console.log(tag_val.id)
-  $('#modal-body').empty(); 
+  $('#modal-body').empty();
   let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
   console.log(url)
   $.ajax({
     type: 'GET',
     url: url,
-    success:function(output) {
+    success: function (output) {
       console.log('categoryID API SUCCESS')
-      if(output.answer == ''){
+      if (output.answer == '') {
         $('#answer_value').text('No answer given')
-      }else{
+      } else {
         $("#modal-body").append(output.answer)
       }
-     $('#answerCard').modal('show');
+      $('#answerCard').modal('show');
     },
-    error:function(err) {
+    error: function (err) {
       console.log('categoryID API HIT ERR')
       console.log(err)
-       }
-    });
+    }
+  });
 })
 
 const close_answer = () => {
