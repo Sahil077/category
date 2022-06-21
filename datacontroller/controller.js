@@ -436,5 +436,17 @@ module.exports = function (app) {
         adminUsername = ""
         res.render('adminloginPage')
     })
+    
+       // PAYEMENT API'S
+    
+    app.get('/privacy_policy' , (req,res)=>{
+        res.render('privacy_policy')
+    })
+    app.get('/terms_condition' , (req,res)=>{
+        res.render('terms_condition')
+    })
+    app.get('/return_policy' , (req,res)=>{
+        res.render('return_policy')
+    })
 
 }
