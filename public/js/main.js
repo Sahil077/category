@@ -16,7 +16,7 @@ const techValue = () => {
       if (output.length > 0) {
         var str = ""
         var tags_str = ""
-        for(var i= 0 ; i< output.length ; i++) {
+        for (var i = 0; i < output.length; i++) {
           var categoryId = (output[i]._id).toString()
           // var edit_div = 'question_div' + [i]
           str += `<div class="row mb-4 edit_div">
@@ -28,10 +28,15 @@ const techValue = () => {
                           <i class="fas fa-trash delete-logo" id="${categoryId}"></i>
                       </div>   
                     </div>`
-            for(var j =0 ; j < (output[i].tags).length; j++){
-              tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
-            }
-        
+          for (var j = 0; j < (output[i].tags).length; j++) {
+            sorted_tags.push(output[i].tags[j] + '_' + [j])
+          }
+        }
+        const tag_name = Array.from(new Set(sorted_tags));
+        const ordered_tags = tag_name.sort()
+        for (var i = 0; i < ordered_tags.length; i++) {
+          var toShow = ordered_tags[i].split('_')[0]
+          tags_str += `<li><a class="tag" id="${ordered_tags}">${toShow}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -90,7 +95,6 @@ const deleteQuestion = (targetElement) => {
 
 $('.tags').on('click', function (event) {
   const tag_val = event.target;
-  console.log('TAG_VAL = ' + tag_val)
   var css_id = (tag_val.id)
   console.log('CSS_ID = ' + css_id)
   var split_id = (tag_val.id).split('_')[0]
