@@ -12,7 +12,6 @@ const techValue = () => {
     url: url,
     success: function (output) {
       console.log(output);
-      const sorted_tags = []
       if (output.length > 0) {
         var str = ""
         var tags_str = ""
@@ -29,14 +28,9 @@ const techValue = () => {
                       </div>   
                     </div>`
           for (var j = 0; j < (output[i].tags).length; j++) {
-            sorted_tags.push(output[i].tags[j] + '_' + [j])
+            tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
           }
-        }
-        const tag_name = Array.from(new Set(sorted_tags));
-        const ordered_tags = tag_name.sort()
-        for (var i = 0; i < ordered_tags.length; i++) {
-          var toShow = ordered_tags[i].split('_')[0]
-          tags_str += `<li><a class="tag" id="${ordered_tags}">${toShow}</a></li>`
+
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
