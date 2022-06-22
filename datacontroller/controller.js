@@ -448,5 +448,8 @@ module.exports = function (app) {
     app.get('/return_policy' , (req,res)=>{
         res.render('return_policy')
     })
+    app.get('/aboutUs' , (req,res)=>{
+        res.render('aboutUs')
+    })
 
 }
