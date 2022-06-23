@@ -147,7 +147,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   line-height: 1.8;
   text-decoration: none;
   color: inherit;
+  margin-left: 15px;
   /* font-size: larger; */
+}
+
+.footer-distributed .footer-links a:hover {
+  color: #8fb1c8;
 }
 
 .footer-distributed .footer-company-name {
