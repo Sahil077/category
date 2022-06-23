@@ -215,11 +215,19 @@ module.exports = function (app) {
     })
 
     app.get('/success', (req, res) => {
-        console.log(userProfile)
-//         console.log(req.session)
         if (req.session && userProfile.emails[0].verified == true) {
             sessions = req.session
-            res.redirect('/categories')
+            new userLogincredential({
+                username: userProfile.displayName,
+                useremail: userProfile.emails[0].value,
+                created_at: new Date(),
+            }).save(function (err, data) {
+                if (err) {
+                    res.sendStatus(400);
+                } else {
+                    res.redirect('/categories')
+                }
+            });
         } else {
             res.send("error logging in")
         }
