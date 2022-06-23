@@ -103,6 +103,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 186px !important;
 }
 
+.job_role {
+  position: relative;
+    top: 58px;
+    left: 420px;
+    font-weight: bold;
+}
+
+.contact_div {
+  padding-top: 10px;
+  padding-left: 40px;
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+}
+
+
 /* footer */
 .footer-distributed {
   background-color: #000;
@@ -277,11 +292,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     max-width: 60%;
     /* display: flex; */
     position: relative;
-    left: 82px;
+    left: 136px;
     margin-bottom: 31px;
+    top: 14px;
   }
   .tags_div{
     margin: 8px;
+  }
+  .job_role {
+    position: absolute;
+    top: 115px;
+    left: 12px;
+    font-weight: bold;
   }
 }
 
