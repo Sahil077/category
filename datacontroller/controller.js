@@ -234,19 +234,27 @@ module.exports = function (app) {
     app.get('/success', (req, res) => {
 
         if (req.session && userProfile.emails[0].verified == true) {
-            sessions = req.session
-
-            new userLogincredential({
-                username: userProfile.displayName,
-                useremail: userProfile.emails[0].value,
-                created_at: new Date(),
-            }).save(function (err, data) {
-                if (err) {
-                    res.sendStatus(400);
-                } else {
+            // sessions = req.session
+            userLogincredential.findOne({
+                useremail: userProfile.emails[0].value
+            },function(err,data){
+                if(err) throw err;
+                if(data){
                     res.redirect('/subscription')
+                }else{
+                    new userLogincredential({
+                        username: userProfile.displayName,
+                        useremail: userProfile.emails[0].value,
+                        created_at: new Date(),
+                    }).save(function (err, data) {
+                        if (err) {
+                            res.sendStatus(400);
+                        } else {
+                            res.redirect('/subscription')
+                        }
+                    });
                 }
-            });
+            })
         } else {
             res.send("error logging in")
         }
@@ -541,6 +549,7 @@ module.exports = function (app) {
 
 
         if (razorpay_signature === generated_signature) {
+            sessions = req.session
             res.json({
                 success: true,
                 message: "Payment has been verified"
@@ -551,7 +560,6 @@ module.exports = function (app) {
                 message: "Payment verification failed"
             })
     });
-
 
 
 
