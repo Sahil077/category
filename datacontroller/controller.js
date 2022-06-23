@@ -28,6 +28,14 @@ const adminSchema = new mongoose.Schema({
 
 const adminLogin = mongoose.model("adminLogin", adminSchema);
 
+const userSchema = new mongoose.Schema({
+    username: String,
+    useremail: String,
+    created_at: Date
+})
+
+const userLogincredential = mongoose.model("userLogincredential", userSchema);
+
 passport.serializeUser(function (user, cb) {
     cb(null, user.id);
 });
