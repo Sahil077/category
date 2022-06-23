@@ -215,8 +215,8 @@ module.exports = function (app) {
     })
 
     app.get('/success', (req, res) => {
-
-        console.log(req.session)
+        console.log(userProfile)
+//         console.log(req.session)
         if (req.session && userProfile.emails[0].verified == true) {
             sessions = req.session
             res.redirect('/categories')
