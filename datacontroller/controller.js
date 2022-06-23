@@ -451,5 +451,8 @@ module.exports = function (app) {
     app.get('/aboutUs' , (req,res)=>{
         res.render('aboutUs')
     })
+     app.get('/contactUs' , (req,res)=>{
+        res.render('contactUs')
+    })
 
 }
