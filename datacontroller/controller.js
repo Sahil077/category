@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 mongoose.pluralize(null);
 const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
+const Razorpay = require('razorpay');
+var crypto = require('crypto');
 
 mongoose.connect("mongodb+srv://intadmin:intramin123@cluster0.2hbsso0.mongodb.net/categories?retryWrites=true&w=majority", {
     useNewUrlParser: true,
@@ -62,6 +63,14 @@ passport.use(new GoogleStrategy({
         return done(null, userProfile);
     }
 ));
+
+const razorpayInstance = new Razorpay({
+
+    // Replace with your key_id
+    key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+    // Replace with your key_secret
+    key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+});
 
 module.exports = function (app) {
 
@@ -223,8 +232,10 @@ module.exports = function (app) {
     })
 
     app.get('/success', (req, res) => {
+
         if (req.session && userProfile.emails[0].verified == true) {
             sessions = req.session
+
             new userLogincredential({
                 username: userProfile.displayName,
                 useremail: userProfile.emails[0].value,
@@ -233,7 +244,7 @@ module.exports = function (app) {
                 if (err) {
                     res.sendStatus(400);
                 } else {
-                    res.redirect('/categories')
+                    res.redirect('/subscription')
                 }
             });
         } else {
@@ -452,23 +463,96 @@ module.exports = function (app) {
         adminUsername = ""
         res.render('adminloginPage')
     })
-    
-       // PAYEMENT API'S
-    
-    app.get('/privacy_policy' , (req,res)=>{
+
+    // PAYEMENT API'S
+
+    app.get('/privacy_policy', (req, res) => {
         res.render('privacy_policy')
     })
-    app.get('/terms_condition' , (req,res)=>{
+    app.get('/terms_condition', (req, res) => {
         res.render('terms_condition')
     })
-    app.get('/return_policy' , (req,res)=>{
+    app.get('/return_policy', (req, res) => {
         res.render('return_policy')
     })
-    app.get('/aboutUs' , (req,res)=>{
+
+    app.get('/aboutUs', (req, res) => {
         res.render('aboutUs')
     })
-     app.get('/contactUs' , (req,res)=>{
+    app.get('/contactUs', (req, res) => {
         res.render('contactUs')
     })
+
+    app.get('/subscription', (req, res) => {
+        res.render('subscription')
+    })
+
+    //Inside app.js
+    app.post('/createOrder', (req, res) => {
+
+        // STEP 1:
+        const {
+            amount,
+            currency,
+            receipt
+        } = req.body;
+
+        // STEP 2:	
+        razorpayInstance.orders.create({
+                amount,
+                currency,
+                receipt
+            },
+            (err, order) => {
+
+                //STEP 3 & 4:
+                if (!err)
+                    res.json(order)
+                else
+                    res.send(err);
+            }
+        )
+    });
+
+    //Inside app.js
+    app.post('/verifyOrder', (req, res) => {
+
+        // STEP 7: Receive Payment Data
+        const {
+            order_id,
+            payment_id,
+            signature
+        } = req.body;
+        const razorpay_signature = signature;
+
+        // Pass yours key_secret here
+        const key_secret = 'c9uW8hNPY33pmIWzeoSY0vZP';
+
+        // STEP 8: Verification & Send Response to User
+
+        // Creating hmac object
+        let hmac = crypto.createHmac('sha256', key_secret);
+
+        // Passing the data to be hashed
+        hmac.update(order_id + "|" + payment_id);
+
+        // Creating the hmac in the required format
+        const generated_signature = hmac.digest('hex');
+
+
+        if (razorpay_signature === generated_signature) {
+            res.json({
+                success: true,
+                message: "Payment has been verified"
+            })
+        } else
+            res.json({
+                success: false,
+                message: "Payment verification failed"
+            })
+    });
+
+
+
 
 }
