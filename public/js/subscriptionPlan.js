@@ -29,7 +29,7 @@ document.getElementById('pay').onclick = function (e) {
 
 function createSubscription(data){
     console.log(JSON.stringify(data))
-    let url = https://interviewhelp.me/subscriptions'
+    let url = 'https://interviewhelp.me/subscriptions'
     $.ajax({
         type: 'POST',
         url: url,
