@@ -241,6 +241,7 @@ module.exports = function (app) {
             }, function (err, data) {
                 if (err) throw err;
                 if (data) {
+                    console.log('PAYEMNT = ' + data[0].payment)
                     if (data[0].payment == true) {
                         sessions = req.session
                         res.redirect('/categories')
@@ -252,6 +253,7 @@ module.exports = function (app) {
                         username: userProfile.displayName,
                         useremail: userProfile.emails[0].value,
                         created_at: new Date(),
+                        payment:false
                     }).save(function (err, data) {
                         if (err) {
                             res.sendStatus(400);
@@ -582,6 +584,8 @@ module.exports = function (app) {
             message: "Payment verification failed"
         })
     });
+
+
 
 
 }
