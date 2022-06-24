@@ -240,16 +240,18 @@ module.exports = function (app) {
                 useremail: userProfile.emails[0].value
             }, function (err, data) {
                 if (err) throw err;
-                  console.log('PAYEMNT = ' +data.payment)
+                console.log('PAYEMNT = ' +data)
                 if (data) {
-                    console.log('PAYEMNT = ' + data.payment)
+                    console.log('OLD USER WITH SUBSCRIPTIOIN')
                     if (data.payment == true) {
                         sessions = req.session
                         res.redirect('/categories')
                     } else {
+                        console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
                         res.redirect('/subscription')
                     }
                 } else {
+                    console.log('NEW USER')
                     new userLogincredential({
                         username: userProfile.displayName,
                         useremail: userProfile.emails[0].value,
