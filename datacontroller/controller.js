@@ -247,14 +247,17 @@ module.exports = function (app) {
                     console.log('OLD USER WITH SUBSCRIPTIOIN')
                     var instance = new Razorpay({ key_id: 'rzp_test_umWrzSCH1vLjLL', key_secret: 'e9jv1rohg1D2bWB0DAio3amJ' })
                     var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
-                    console.log('DATA = ' + subscriptionDATA)
-                    if(subscriptionDATA.status == 'active'){
-                        sessions = req.session
-                        res.redirect('/categories')
-                    }else{
-                        console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                        res.redirect('/subscriptionPlan')
-                    }
+                    console.log('DATA = ' + JSON.stringify(subscriptionDATA))
+                    subscriptionDATA.then(meta => {
+                        console.log('SUB Data = ' + JSON.stringify(meta)); 
+                        if(meta.status == 'Active'){
+                            sessions = req.session
+                            res.redirect('/categories')
+                        }else{
+                            console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                            res.redirect('/subscriptionPlan')
+                        }
+                    }).catch(err => {console.log(err)})  
                 } else {
                     console.log('NEW USER')
                     new userLogincredential({
