@@ -568,24 +568,31 @@ module.exports = function (app) {
                 $set: {
                     'payment': true
                 }
+            }, function (err, data) {
+                if (err) throw err;
+                console.log('UPDATE QUERY =' + data)
+                res.json({
+                    success: true,
+                    message: "Payment has been verified"
+                })
             })
-            res.json({
-                success: true,
-                message: "Payment has been verified"
-            })
-        } else
-            // PAYMENT CHANGED FROM FALSE TO TRUE
+        } else {
+            // PAYMENT DID'NT CHANGED
             userLogincredential.update({
                 'useremail': userProfile.emails[0].value
             }, {
                 $set: {
                     'payment': false
                 }
+            }, function (err, data) {
+                if (err) throw err;
+                console.log('UPDATE QUERY for PAYMENT DIDNT CHANGED =' + data)
+                res.json({
+                    success: true,
+                    message: "Payment has been verified"
+                })
             })
-        res.json({
-            success: false,
-            message: "Payment verification failed"
-        })
+        }
     });
 
 
