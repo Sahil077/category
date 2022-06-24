@@ -33,7 +33,9 @@ const userSchema = new mongoose.Schema({
     username: String,
     useremail: String,
     created_at: Date,
-    payment: false
+    payment: false,
+    subscriptions_id:'',
+    plan_id:''
 })
 
 const userLogincredential = mongoose.model("userLogincredential", userSchema);
@@ -240,15 +242,18 @@ module.exports = function (app) {
                 useremail: userProfile.emails[0].value
             }, function (err, data) {
                 if (err) throw err;
-                console.log('PAYEMNT = ' +data)
+                console.log('PAYEMNT = ' + data)
                 if (data) {
                     console.log('OLD USER WITH SUBSCRIPTIOIN')
-                    if (data.payment == true) {
+                    var instance = new Razorpay({ key_id: 'rzp_test_umWrzSCH1vLjLL', key_secret: 'e9jv1rohg1D2bWB0DAio3amJ' })
+                    var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
+                    console.log('DATA = ' + subscriptionDATA)
+                    if(subscriptionDATA.status == 'active'){
                         sessions = req.session
                         res.redirect('/categories')
-                    } else {
+                    }else{
                         console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                        res.redirect('/subscription')
+                        res.redirect('/subscriptionPlans')
                     }
                 } else {
                     console.log('NEW USER')
@@ -256,12 +261,14 @@ module.exports = function (app) {
                         username: userProfile.displayName,
                         useremail: userProfile.emails[0].value,
                         created_at: new Date(),
-                        payment:false
+                        payment: false,
+                        subscriptions_id:'',
+                        plan_id:''
                     }).save(function (err, data) {
                         if (err) {
                             res.sendStatus(400);
                         } else {
-                            res.redirect('/subscription')
+                            res.redirect('/subscriptionPlans')
                         }
                     });
                 }
@@ -595,6 +602,80 @@ module.exports = function (app) {
         }
     });
 
+        // SUBSCRIPTION PLAN....................
+
+    app.get('/subscriptionPlan',(req,res) => {
+        res.render('subscriptionPlan')
+    })
+
+    // CREATE PLAN FOR SUBSCRIPTION
+    app.post('/plans', (req, res) => {
+        var instance = new Razorpay({
+            key_id: 'rzp_test_umWrzSCH1vLjLL',
+            key_secret: 'e9jv1rohg1D2bWB0DAio3amJ'
+        })
+
+        instance.plans.create({
+            period: "daily",
+            interval: 7,
+            item: {
+                name: "Test plan - daily",
+                amount: 100,
+                currency: "INR"
+            }
+        },(err,responce) => {
+            if(err){
+                console.log(err)
+            }else{
+                res.json(responce)
+            }
+        })
+    })
+
+    // CREATE SUBSCRIPTION
+    app.post('/subscriptions', (req, res) => {
+        var instance = new Razorpay({
+            key_id: 'rzp_test_umWrzSCH1vLjLL',
+            key_secret: 'e9jv1rohg1D2bWB0DAio3amJ'
+        })
+        console.log('PLAN ID =' + req.body.id)
+        var plan_id = req.body.id
+        let experiy_date = Math.floor(new Date('2022.06.28').getTime() / 1000)
+        instance.subscriptions.create({
+            plan_id: req.body.id,
+            customer_notify: 1,
+            total_count: 6,
+            expire_by:experiy_date,
+            addons: [
+              {
+                item: {
+                  name: "Delivery charges",
+                  amount: 100,
+                  currency: "INR"
+                }
+              }
+            ]
+          },(err,responce) => {
+            if(err){
+                console.log(err)
+            }else{
+                userLogincredential.update({
+                    'useremail': userProfile.emails[0].value
+                }, {
+                    $set: {
+                        'plan_id': plan_id,
+                        'subscriptions_id':responce.id
+                    }
+                }, function (err, data) {
+                    if (err) throw err;
+                    res.json(responce)
+                })
+       
+                console.log('SUB = ' + responce)
+                res.json(responce)
+            }
+        })
+    })
 
 
 
