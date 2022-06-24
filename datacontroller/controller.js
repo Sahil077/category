@@ -250,7 +250,7 @@ module.exports = function (app) {
                     console.log('DATA = ' + JSON.stringify(subscriptionDATA))
                     subscriptionDATA.then(meta => {
                         console.log('SUB Data = ' + JSON.stringify(meta)); 
-                        if(meta.status == 'Active'){
+                        if(meta.status == 'active'){
                             sessions = req.session
                             res.redirect('/categories')
                         }else{
