@@ -32,7 +32,8 @@ const adminLogin = mongoose.model("adminLogin", adminSchema);
 const userSchema = new mongoose.Schema({
     username: String,
     useremail: String,
-    created_at: Date
+    created_at: Date,
+    payment: false
 })
 
 const userLogincredential = mongoose.model("userLogincredential", userSchema);
@@ -234,14 +235,19 @@ module.exports = function (app) {
     app.get('/success', (req, res) => {
 
         if (req.session && userProfile.emails[0].verified == true) {
-            // sessions = req.session
+
             userLogincredential.findOne({
                 useremail: userProfile.emails[0].value
-            },function(err,data){
-                if(err) throw err;
-                if(data){
-                    res.redirect('/subscription')
-                }else{
+            }, function (err, data) {
+                if (err) throw err;
+                if (data) {
+                    if (data[0].payment == true) {
+                        sessions = req.session
+                        res.redirect('/categories')
+                    } else {
+                        res.redirect('/subscription')
+                    }
+                } else {
                     new userLogincredential({
                         username: userProfile.displayName,
                         useremail: userProfile.emails[0].value,
@@ -550,17 +556,32 @@ module.exports = function (app) {
 
         if (razorpay_signature === generated_signature) {
             sessions = req.session
+            // PAYMENT CHANGED FROM FALSE TO TRUE
+            userLogincredential.update({
+                'useremail': userProfile.emails[0].value
+            }, {
+                $set: {
+                    'payment': true
+                }
+            })
             res.json({
                 success: true,
                 message: "Payment has been verified"
             })
         } else
-            res.json({
-                success: false,
-                message: "Payment verification failed"
+            // PAYMENT CHANGED FROM FALSE TO TRUE
+            userLogincredential.update({
+                'useremail': userProfile.emails[0].value
+            }, {
+                $set: {
+                    'payment': false
+                }
             })
+        res.json({
+            success: false,
+            message: "Payment verification failed"
+        })
     });
-
 
 
 }
