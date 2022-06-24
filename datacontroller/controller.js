@@ -243,7 +243,7 @@ module.exports = function (app) {
                   console.log('PAYEMNT = ' +data.payment)
                 if (data) {
                     console.log('PAYEMNT = ' + data.payment)
-                    if (data[0].payment == true) {
+                    if (data.payment == true) {
                         sessions = req.session
                         res.redirect('/categories')
                     } else {
