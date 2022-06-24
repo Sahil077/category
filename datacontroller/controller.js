@@ -240,9 +240,9 @@ module.exports = function (app) {
                 useremail: userProfile.emails[0].value
             }, function (err, data) {
                 if (err) throw err;
-                  console.log('PAYEMNT = ' +data)
+                  console.log('PAYEMNT = ' +data.payment)
                 if (data) {
-                    console.log('PAYEMNT = ' + data[0].payment)
+                    console.log('PAYEMNT = ' + data.payment)
                     if (data[0].payment == true) {
                         sessions = req.session
                         res.redirect('/categories')
