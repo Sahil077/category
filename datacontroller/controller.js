@@ -240,6 +240,7 @@ module.exports = function (app) {
                 useremail: userProfile.emails[0].value
             }, function (err, data) {
                 if (err) throw err;
+                  console.log('PAYEMNT = ' +data)
                 if (data) {
                     console.log('PAYEMNT = ' + data[0].payment)
                     if (data[0].payment == true) {
