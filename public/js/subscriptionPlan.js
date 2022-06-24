@@ -4,7 +4,7 @@ document.getElementById('pay').onclick = function (e) {
     const amount = 100
     const currency = 'INR'
     const name = 'InterviewHelp Feature'
-    let url = 'http://localhost:3000/plans'
+    let url = 'https://interviewhelp.me/plans'
     $.ajax({
         type: 'POST',
         url: url,
@@ -29,7 +29,7 @@ document.getElementById('pay').onclick = function (e) {
 
 function createSubscription(data){
     console.log(JSON.stringify(data))
-    let url = 'http://localhost:3000/subscriptions'
+    let url = https://interviewhelp.me/subscriptions'
     $.ajax({
         type: 'POST',
         url: url,
@@ -50,50 +50,3 @@ function createSubscription(data){
         }
     });
 }
-
-// function verifyPayment(orderDetails) {
-//     console.log(JSON.stringify(orderDetails))
-//     var options = { 
-//         "key": "rzp_test_umWrzSCH1vLjLL",
-//         "subscription_id": orderDetails.id, 
-//         "name": "InterviewHelp", 
-//         "description": "Monthly Test Plan", 
-//         "handler": function(response) { 
-//             console.log(response)
-//             razorPayverify(response)
-//         } 
-//      }; 
-//      var paymentObject = new Razorpay(options);
-//      paymentObject.open()
-// }
-
-// function razorPayverify(data){
-//     console.log('KEYS======= ' + JSON.stringify(data))
-
-//     const order_id = data.razorpay_subscription_id
-//     const payment_id = data.razorpay_payment_id
-//     const signature = data.razorpay_signature
-//     let url = 'http://localhost:3000/verifyOrder'
-//     $.ajax({
-//         type: 'POST',
-//         url: url,
-//         contentType: "application/json",
-//         data: JSON.stringify({
-//             sub_id: order_id,
-//             payment_id: payment_id,
-//             signature: signature,
-//         }),
-//         success: function (output) {
-//             console.log(output);
-//             if(output.success == true){
-//                 window.open(`http://localhost:3000/categories`, "_self")
-//             }else{
-//                 alert('Payment Failed, Try again Later.')
-//             }
-            
-//         },
-//         error: function (err) {
-//             console.log(err)
-//         }
-//     });
-// }
