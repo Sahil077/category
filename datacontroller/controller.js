@@ -253,7 +253,7 @@ module.exports = function (app) {
                         res.redirect('/categories')
                     }else{
                         console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                        res.redirect('/subscriptionPlans')
+                        res.redirect('/subscriptionPlan')
                     }
                 } else {
                     console.log('NEW USER')
@@ -268,7 +268,7 @@ module.exports = function (app) {
                         if (err) {
                             res.sendStatus(400);
                         } else {
-                            res.redirect('/subscriptionPlans')
+                            res.redirect('/subscriptionPlan')
                         }
                     });
                 }
