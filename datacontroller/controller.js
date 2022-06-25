@@ -692,6 +692,8 @@ module.exports = function (app) {
             const subscription_id = data.subscriptions_id
             var secret = "e9jv1rohg1D2bWB0DAio3amJ"
             generated_signature = hmac_sha256(razorpay_payment_id + "|" + subscription_id, secret);
+             console.log(generated_signature)
+            console.log(razorpay_signature)
             if (generated_signature == razorpay_signature) {
                res.json({
                    success:true
