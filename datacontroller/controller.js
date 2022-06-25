@@ -683,6 +683,7 @@ module.exports = function (app) {
         app.post('/verifypayment', (req, res) => {
         const razorpay_payment_id = req.body.payment_id
         const razorpay_signature = req.body.signature
+        console.log("userProfile = " + userProfile)  
         userLogincredential.findOne({
             useremail: userProfile.emails[0].value
         }, function (err, data) {
