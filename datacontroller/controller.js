@@ -679,6 +679,30 @@ module.exports = function (app) {
             }
         })
     })
+    
+        app.post('/verifypayment', (req, res) => {
+        const razorpay_payment_id = req.body.payment_id
+        const razorpay_signature = req.body.signature
+        userLogincredential.findOne({
+            useremail: userProfile.emails[0].value
+        }, function (err, data) {
+            if (err) throw err;
+            console.log('PAYEMNT = ' + data.subscriptions_id)
+            const subscription_id = data.subscriptions_id
+            var secret = "e9jv1rohg1D2bWB0DAio3amJ"
+            generated_signature = hmac_sha256(razorpay_payment_id + "|" + subscription_id, secret);
+            if (generated_signature == razorpay_signature) {
+               res.json({
+                   success:true
+               })
+            }else{
+                res.json({
+                    success:false
+                })
+            }
+        })
+    })
+
 
 
 
