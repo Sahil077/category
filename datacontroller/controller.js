@@ -674,8 +674,8 @@ module.exports = function (app) {
                     res.json(responce)
                 })
        
-                console.log('SUB = ' + responce)
-                res.json(responce)
+               // console.log('SUB = ' + responce)
+               // res.json(responce)
             }
         })
     })
