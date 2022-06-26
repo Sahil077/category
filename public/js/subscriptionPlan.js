@@ -1,4 +1,5 @@
-document.getElementById('pay').onclick = function (e) {
+function createPlan(){
+// document.getElementById('pay').onclick = function (e) {
     const period = 'daily'
     const interval = 1
     const amount = 100
