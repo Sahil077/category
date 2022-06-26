@@ -662,7 +662,7 @@ module.exports = function (app) {
             if(err){
                 console.log(err)
             }else{
-                console.log(userProfile)
+                console.log('logedIN =' +userProfile)
                 userLogincredential.update({
                     'useremail': userProfile.emails[0].value
                 }, {
