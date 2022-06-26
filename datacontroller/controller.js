@@ -672,6 +672,7 @@ module.exports = function (app) {
                     }
                 }, function (err, data) {
                     if (err) throw err;
+                    sessions = req.session
                     res.json(responce)
                 })
 
