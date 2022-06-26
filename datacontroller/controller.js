@@ -662,6 +662,7 @@ module.exports = function (app) {
             if(err){
                 console.log(err)
             }else{
+                console.log(userProfile)
                 userLogincredential.update({
                     'useremail': userProfile.emails[0].value
                 }, {
@@ -673,42 +674,9 @@ module.exports = function (app) {
                     if (err) throw err;
                     res.json(responce)
                 })
-       
-               // console.log('SUB = ' + responce)
-               // res.json(responce)
+
             }
         })
     })
     
-        app.post('/verifypayment', (req, res) => {
-        const razorpay_payment_id = req.body.payment_id
-        const razorpay_signature = req.body.signature
-        console.log("userProfile = " + userProfile)  
-        userLogincredential.findOne({
-            useremail: userProfile.emails[0].value
-        }, function (err, data) {
-            if (err) throw err;
-            console.log('PAYEMNT = ' + data.subscriptions_id)
-            const subscription_id = data.subscriptions_id
-            var secret = "e9jv1rohg1D2bWB0DAio3amJ"
-            let hmac = crypto.createHmac('sha256', secret);
-            hmac.update(subscription_id + "|" + razorpay_payment_id);
-            const generated_signature = hmac.digest('hex');
-            console.log(generated_signature)
-            console.log(razorpay_signature)
-            if (generated_signature == razorpay_signature) {
-               res.json({
-                   success:true
-               })
-            }else{
-                res.json({
-                    success:false
-                })
-            }
-        })
-    })
-
-
-
-
 }
