@@ -62,9 +62,9 @@ function verifyPayment(orderDetails) {
             console.log(response)
             // razorPayverify(response)
             if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
-                window.open(`https://interviewhelp.me/categories`, "_self")
+                window.open(`http://localhost:3000/subscriptionPlan`, "_self")
               } else {
-                window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
+                window.open(`http://localhost:3000/categories`, "_self")
               }
         } 
      }; 
