@@ -39,11 +39,11 @@ function createSubscription(data){
         }),
         success: function (output) {
             console.log('CREATE SUBSCRIPTION '+ JSON.stringify(output));
-        //     verifyPayment(output)
-            document.getElementById('payforsubscription').style.display = 'block'
-            document.getElementById('pay').style.display = 'none'
-            var a = document.getElementById('payforsubscription'); //or grab it by tagname etc
-            a.href = output.short_url
+            verifyPayment(output)
+          //  document.getElementById('payforsubscription').style.display = 'block'
+          //  document.getElementById('pay').style.display = 'none'
+         //   var a = document.getElementById('payforsubscription'); //or grab it by tagname etc
+         //   a.href = output.short_url
         },
         error: function (err) {
             console.log(err)
@@ -51,21 +51,26 @@ function createSubscription(data){
     });
 }
 
-// function verifyPayment(orderDetails) {
-//     console.log(JSON.stringify(orderDetails))
-//     var options = { 
-//         "key": "rzp_test_umWrzSCH1vLjLL",
-//         "subscription_id": orderDetails.id, 
-//         "name": "InterviewHelp", 
-//         "description": "Monthly Test Plan", 
-//         "handler": function(response) { 
-//             console.log(response)
-//             razorPayverify(response)
-//         } 
-//      }; 
-//      var paymentObject = new Razorpay(options);
-//      paymentObject.open()
-// }
+function verifyPayment(orderDetails) {
+    console.log(JSON.stringify(orderDetails))
+    var options = { 
+        "key": "rzp_test_umWrzSCH1vLjLL",
+        "subscription_id": orderDetails.id, 
+        "name": "InterviewHelp", 
+        "description": "Monthly Test Plan", 
+        "handler": function(response) { 
+            console.log(response)
+            // razorPayverify(response)
+            if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
+                window.open(`https://interviewhelp.me/categories`, "_self")
+              } else {
+                window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
+              }
+        } 
+     }; 
+     var paymentObject = new Razorpay(options);
+     paymentObject.open()
+}
 
 // function razorPayverify(data){
 //     console.log('KEYS======= ' + JSON.stringify(data))
