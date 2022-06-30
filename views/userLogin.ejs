@@ -1,23 +1,105 @@
-<html>
+<!doctype html>
+<html lang="en">
+
 <head>
-    <title>Google SignIn</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../css/userLogin.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+<style>
+  .query_section {
+    margin-top: 62px;
+  }
+
+  .login-container {
+    position: relative;
+  }
+
+  .center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+  .btn-login{
+    border-radius: 30px;
+  }
+  .answer-container{
+    margin-top: 54px;
+    margin-left: 20px;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  body {
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+</style>
+
 <body>
-<div class="container">
-    <div class="jumbotron text-center text-primary">
-     
-        <div class="form">
-          <h6 style="text-align: center;font-weight: bold;text-decoration: underline;">User Login</h6>
-         <img src="http://www.androidpolice.com/wp-content/themes/ap2/ap_resize/ap_resize.php?src=http%3A%2F%2Fwww.androidpolice.com%2Fwp-content%2Fuploads%2F2015%2F10%2Fnexus2cee_Search-Thumb-150x150.png&w=150&h=150&zc=3"> 
-                                        
-          <a href="/auth/google" class="btn btn-danger"><span class="fa fa-google"></span> SignIn with Google</a>
-          
-          </div>
-        <!-- <a href="/auth/google" class="btn btn-danger"><span class="fa fa-google"></span> SignIn with Google</a> -->
+
+  <div>
+    <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-6">
+        <img src="../img/3969587.jpg" alt="about" width="100%" height="100%">
+      </div>
+      <div class="col-lg-9 col-md-9 col-sm-6 query_section">
+        <div class="row">
+          <p>What are the differences between Continuous Integration, Continuous Delivery, and Continuous Deployment?
+          </p>
+        </div>
+        <div class="row mb-2">
+          <p>How to setup jenkins to execute a schedule job/pipeline & how it is triggered?</p>
+        </div>
+        <div class="row mb-2">
+          <p>Don't worry InterviewHelp Platform will assist you in preparing best for interviews & getting a job
+            opportunity.</p>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+
+  <div class="login-container">
+    <div class="center">
+      <a href="/auth/google" class="btn btn-danger btn-login"><span class="fa fa-google"></span> SignIn with Google</a>
+    </div>
+  </div>
+
+  <div class="answer-container">
+    <p>Answers are fine tuned for you, so that interviewer <br> gets impressed.</p>
+  </div>
+
+  <div class="feedback-queries">
+    <div class="row">
+      <div class="col-lg-4 mt-4">
+        <img src="../img/feedback_1.jpeg" alt="about" width="100%" height="50%">
+      </div>
+      <div class="col-lg-4">
+        <img src="../img/3969587.jpg" alt="about" width="80%" height="80%">
+      </div>
+      <div class="col-lg-4">
+        <img src="../img/feedback_2.jpeg" alt="about" width="80%" height="80%">
+      </div>
+    </div>
+  </div>
+
+  <div class="login-container mb-4">
+    <div class="center">
+      <a href="/auth/google" class="btn btn-danger btn-login"><span class="fa fa-google"></span> SignIn with Google</a>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+  </script>
 </body>
+
 </html>
