@@ -14,13 +14,22 @@ const categorySchema = new mongoose.Schema({
     category_name: String,
     question: String,
     answer: String,
-    tags: [],
+    technical_tagName: String,
     created_at: Date,
     adminId: String
 
 })
 
 const categories = mongoose.model("categories", categorySchema);
+
+const tagsSchema = new mongoose.Schema({
+    technical_tagName: String,
+    tags: [],
+    adminId: String,
+    category_name:String
+})
+
+const Technical_tags = mongoose.model("tags", tagsSchema);
 
 const adminSchema = new mongoose.Schema({
     username: String,
@@ -34,8 +43,8 @@ const userSchema = new mongoose.Schema({
     useremail: String,
     created_at: Date,
     payment: false,
-    subscriptions_id:'',
-    plan_id:''
+    subscriptions_id: '',
+    plan_id: ''
 })
 
 const userLogincredential = mongoose.model("userLogincredential", userSchema);
@@ -51,14 +60,17 @@ passport.deserializeUser(function (obj, cb) {
 var userProfile;
 var sessions;
 var adminUsername;
+var admin_userId;
 /*  Google AUTH  */
 
 const GOOGLE_CLIENT_ID = '65610686925-bko50g7l2c7hrkqqcpvadi3hitv6ito3.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = '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';
+
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
         callbackURL: "https://interviewhelp.me/auth/google/callback",
+       
         scope: ['profile', 'email'],
     },
     function (accessToken, refreshToken, profile, done) {
@@ -116,20 +128,59 @@ module.exports = function (app) {
     // Get Categories by Name
     app.get('/categoryName/:category_name', (req, res) => {
 
-        categories.find({
-            'category_name': req.params.category_name
-        }).
-        then(updateCategory =>
-                res.json(updateCategory)
-            )
-            .catch(err => {
-                res.json(err)
+        const tag_data = []
+        categories.aggregate(
+            [{
+                $match: {
+                    'category_name': req.params.category_name,
+                }
+            }],
+            function (err, categorydata) {
+                if (err) throw err;
+            console.log('----------  '+ JSON.stringify(categorydata))
+                for (var i = 0; i < categorydata.length; i++) {
+                    tag_data.push(categorydata[i].technical_tagName)
+                }
+                Technical_tags.aggregate([{
+                        $match: {
+                            technical_tagName: {
+                                $in: tag_data
+                            },
+                            'category_name': req.params.category_name
+                        }
+                    }],
+                    function (err, tagData) {
+                        if (err) throw err;
+                        console.log('TAG = ' + tagData)
+                        const finalValue = []
+                        // console.log('cat = ' + JSON.stringify(categorydata))
+                        for (var j = 0; j < categorydata.length; j++) {
+                            for (var tagvalue = 0; tagvalue < tagData.length; tagvalue++) {
+                                if (categorydata[j].technical_tagName == tagData[tagvalue].technical_tagName) {
+                                    // tagDatavalue.push(tagData[tagvalue].tags)
+                                    const finalCategory = {
+                                        _id: categorydata[j]._id,
+                                        category_name: categorydata[j].category_name,
+                                        question: categorydata[j].question,
+                                        answer: categorydata[j].answer,
+                                        technical_tagName: categorydata[j].technical_tagName,
+                                        tags: tagData[tagvalue].tags,
+                                        adminId: req.params.adminId,
+                                        __v: 0
+                                    }
+                                    finalValue.push(finalCategory)
+                                }
+                            }
+                        }
+                        res.json(finalValue)
+                    })
+
             })
     })
 
     // Get single Category by ID
     app.get('/categoryID/:id', (req, res) => {
-        console.log('categoryID API HIT')
+        // console.log('categoryID API HIT')
         categories.findOne({
             _id: req.params.id
         }).
@@ -162,8 +213,7 @@ module.exports = function (app) {
 
     // update category by category id
     app.put('/categoryID/:id', (req, res) => {
-        console.log(req.params.id)
-        console.log(req.body)
+        console.log((req.body))
         var tags = []
         if (req.body.tags) {
             var tags_list = (req.body.tags).split(",")
@@ -171,20 +221,29 @@ module.exports = function (app) {
                 tags.push((tags_list[tag]).replace(/ /g, ""))
             }
         }
+
         categories.update({
-                _id: req.params.id
+            _id: req.params.id
+        }, {
+            $set: {
+                question: req.body.question,
+                answer: (req.body.answer).toString(),
+                // tags: tags
+            }
+        }, function (err, updatedCategory) {
+            if (err) throw err;
+            Technical_tags.update({
+                _id: req.body.technical_tag_id
             }, {
                 $set: {
-                    question: req.body.question,
-                    answer: req.body.answer,
+                    technical_tagName: req.body.technical_tagName,
                     tags: tags
                 }
-            }).then(updateCategory =>
-                res.json(updateCategory)
-            )
-            .catch(err => {
-                res.json(err)
+            }, function (err, updatedTags) {
+                if (err) throw err;
+                res.json(updatedCategory)
             })
+        })
     })
 
 
@@ -221,14 +280,71 @@ module.exports = function (app) {
     // GET DATA BY TAG NAME
     app.get('/tags/:tag', (req, res) => {
         var tagName = req.params.tag
+        Technical_tags.aggregate(
+            [{
+                $match: {
+                    tags: tagName,
+                }
+            }],
+            function (err, data) {
+                if (err) throw err;
+                console.log(data)
+                categories.aggregate(
+                    [{
+                        $match: {
+                            technical_tagName: data[0].technical_tagName,
+                        }
+                    }],
+                    function (err, cat_data) {
+                        if (err) throw err;
+                        // console.log(cat_data)
+                        res.json(cat_data)
+                    })
 
-        categories.find({
-            tags: tagName
-        }, (err, data) => {
-            if (err) throw err;
-            res.json(data)
-        })
+            })
     })
+
+    app.post('/user/technicalTag',function(req,res){
+        const technical_tagName = req.body.technical_tagName
+        const category_name = req.body.category_name
+        console.log(technical_tagName)
+        console.log(category_name)
+        Technical_tags.aggregate(
+            [{
+                $match: {
+                    technical_tagName: technical_tagName,
+                    category_name:category_name
+                }
+            }],
+            function (err, tagData) {
+                if(err) throw err;
+                // console.log(data)
+                categories.aggregate(
+                    [{
+                        $match: {
+                            technical_tagName: technical_tagName,
+                            category_name:category_name
+                        }
+                    }],
+                    function (err, categorydata) {
+                        if(err) throw err;
+                        // console.log(category_data)
+                        const finalCategory = {
+                            _id: categorydata[0]._id,
+                            category_name: categorydata[0].category_name,
+                            question: categorydata[0].question,
+                            answer: categorydata[0].answer,
+                            technical_tagName: categorydata[0].technical_tagName,
+                            tags: tagData[0].tags,
+                            __v: 0
+                        }
+                        console.log(finalCategory)
+                        res.json(finalCategory)
+                    })
+            })
+
+    })
+
 
     app.get('/', (req, res) => {
         res.render('userLogin')
@@ -237,27 +353,30 @@ module.exports = function (app) {
     app.get('/success', (req, res) => {
 
         if (req.session && userProfile.emails[0].verified == true) {
-
+            console.log('G DETAIL = ' + userProfile)
             userLogincredential.findOne({
                 useremail: userProfile.emails[0].value
             }, function (err, data) {
                 if (err) throw err;
-                console.log('PAYEMNT = ' + data)
                 if (data) {
                     console.log('OLD USER WITH SUBSCRIPTIOIN')
-                    var instance = new Razorpay({ key_id: 'rzp_test_umWrzSCH1vLjLL', key_secret: 'e9jv1rohg1D2bWB0DAio3amJ' })
+                    var instance = new Razorpay({
+                        key_id: 'rzp_test_umWrzSCH1vLjLL',
+                        key_secret: 'e9jv1rohg1D2bWB0DAio3amJ'
+                    })
                     var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
-                    console.log('DATA = ' + JSON.stringify(subscriptionDATA))
                     subscriptionDATA.then(meta => {
-                        console.log('SUB Data = ' + JSON.stringify(meta)); 
-                        if(meta.status == 'active'){
+                        console.log('SUB Data = ' + JSON.stringify(meta));
+                        if (meta.status == 'active') {
                             sessions = req.session
                             res.redirect('/categories')
-                        }else{
+                        } else {
                             console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
                             res.redirect('/subscriptionPlan')
                         }
-                    }).catch(err => {console.log(err)})  
+                    }).catch(err => {
+                        console.log(err)
+                    })
                 } else {
                     console.log('NEW USER')
                     new userLogincredential({
@@ -265,8 +384,8 @@ module.exports = function (app) {
                         useremail: userProfile.emails[0].value,
                         created_at: new Date(),
                         payment: false,
-                        subscriptions_id:'',
-                        plan_id:''
+                        subscriptions_id: '',
+                        plan_id: ''
                     }).save(function (err, data) {
                         if (err) {
                             res.sendStatus(400);
@@ -317,6 +436,8 @@ module.exports = function (app) {
         }, (err, data) => {
             if (err) throw err;
             adminUsername = username
+            admin_userId = data[0]._id
+            // console.log(data)
             res.redirect(`/categories/admin/${data[0]._id}`)
         })
 
@@ -324,7 +445,7 @@ module.exports = function (app) {
     // HOME PAGHE FOR ADMIN
     app.get('/categories/admin/:adminId', (req, res) => {
         const tech_list = [];
-        console.log(adminUsername)
+        // console.log(adminUsername)
         if (adminUsername) {
             categories.find({
                 adminId: req.params.adminId
@@ -345,47 +466,97 @@ module.exports = function (app) {
     })
 
     // Create category
-    app.post('/create/category', (req, res) => {
-        // console.log((req.body.myTextarea).toString())
+    app.post('/create/category', async (req, res) => {
         var tags = []
         var tags_list = (req.body.tags).split(",")
         for (var tag = 0; tag < tags_list.length; tag++) {
             tags.push((tags_list[tag]).replace(/ /g, ""))
         }
         const adminId = req.body.adminId
-        new categories({
+        await new categories({
             category_name: req.body.category_name,
             question: req.body.question,
             answer: (req.body.myTextarea).toString(),
-            tags: tags,
+            technical_tagName: req.body.technicalTag,
             created_at: req.body.date,
             adminId: req.body.adminId
         }).save(function (err, data) {
             if (err) {
                 res.sendStatus(400);
             } else {
-                res.redirect(`/categories/admin/${adminId}`);
+                new Technical_tags({
+                    technical_tagName: req.body.technicalTag,
+                    tags: tags,
+                    adminId: req.body.adminId,
+                    category_name: req.body.category_name
+                }).save(function (err, data) {
+                    if (err) {
+                        res.sendStatus(400);
+                    } else {
+                        res.redirect(`/categories/admin/${adminId}`);
+                    }
+                });
             }
         });
     })
 
     // Get Categories by Name
     app.get('/categoryName/:adminId/:category_name', (req, res) => {
-        console.log(adminUsername)
+        // console.log('HERE')
         if (adminUsername) {
+            // console.log(req.params.category_name)
+            // console.log(req.params.adminId)
+            const tag_data = []
             categories.aggregate(
                 [{
                     $match: {
                         'category_name': req.params.category_name,
                         'adminId': req.params.adminId
                     }
-                }]
-            ).
-            then(updateCategory =>
-                    res.json(updateCategory)
-                )
-                .catch(err => {
-                    res.json(err)
+                }],
+                function (err, categorydata) {
+                    if (err) throw err;
+                console.log('----------  '+ JSON.stringify(categorydata))
+                    for (var i = 0; i < categorydata.length; i++) {
+                        tag_data.push(categorydata[i].technical_tagName)
+                    }
+                    Technical_tags.aggregate([{
+                            $match: {
+                                technical_tagName: {
+                                    $in: tag_data
+                                },
+                                'adminId': req.params.adminId,
+                                'category_name': req.params.category_name
+                            }
+                        }]
+                        // Technical_tags.find({ technical_tagName: { $in: tag_data } }
+                        ,
+                        function (err, tagData) {
+                            if (err) throw err;
+                            console.log('TAG = ' + tagData)
+                            const finalValue = []
+                            // console.log('cat = ' + JSON.stringify(categorydata))
+                            for (var j = 0; j < categorydata.length; j++) {
+                                for (var tagvalue = 0; tagvalue < tagData.length; tagvalue++) {
+                                    if (categorydata[j].technical_tagName == tagData[tagvalue].technical_tagName) {
+                                        // tagDatavalue.push(tagData[tagvalue].tags)
+                                        const finalCategory = {
+                                            _id: categorydata[j]._id,
+                                            category_name: categorydata[j].category_name,
+                                            question: categorydata[j].question,
+                                            answer: categorydata[j].answer,
+                                            technical_tagName: categorydata[j].technical_tagName,
+                                            tags: tagData[tagvalue].tags,
+                                            adminId: req.params.adminId,
+                                            __v: 0
+                                        }
+                                        finalValue.push(finalCategory)
+                                    }
+                                }
+                            }
+                            res.json(finalValue)
+                        })
+
                 })
         } else {
             res.render("adminloginPage")
@@ -393,7 +564,7 @@ module.exports = function (app) {
     })
 
     app.get("/admin/newfeature/:adminId", function (req, res) {
-        console.log(adminUsername)
+        // console.log(adminUsername)
         if (adminUsername) {
             res.render('adminfeature', {
                 updateValue: "",
@@ -405,70 +576,83 @@ module.exports = function (app) {
     });
 
     app.get("/admin/feature/adminId/:adminId/updateID/:updateID", function (req, res) {
-        console.log(adminUsername)
+        // console.log(adminUsername)
         if (adminUsername) {
             categories.findOne({
                 _id: req.params.updateID
-            }).
-            then(updateCategory =>
-                    res.render('adminfeature', {
-                        updateValue: updateCategory,
+            }, function (err, updateCategory) {
+                if (err) throw err;
+                // console.log(updateCategory)
+                const update_technical_tag = updateCategory.technical_tagName
+                Technical_tags.aggregate([{
+                    $match: {
+                        technical_tagName: update_technical_tag,
                         adminId: req.params.adminId
+                    }
+                }]
+                // Technical_tags.findOne({
+                //     technical_tagName: update_technical_tag
+                // }
+                , function (err, techData) {
+                    if (err) throw err;
+                    // console.log(techData)
+                    const finalCategory = {
+                        _id: updateCategory._id,
+                        category_name: updateCategory.category_name,
+                        question: updateCategory.question,
+                        answer: updateCategory.answer,
+                        technical_tagName: update_technical_tag,
+                        tags: techData[0].tags,
+                        technical_tag_id: techData[0]._id,
+                        adminId: req.params.adminId,
+                        __v: 0
+                    }
+                    console.log(finalCategory)
+                    res.render('adminfeature', {
+                        updateValue: finalCategory,
+                        adminId: req.params.adminId,
+                        technical_tag_id: finalCategory.technical_tag_id
                     })
-                )
-                .catch(err => {
-                    res.json(err)
                 })
+            })
         } else {
             res.render("adminloginPage")
         }
     })
 
-    app.put('/categoryID/:id', (req, res) => {
-        console.log((req.body))
-        var tags = []
-        if (req.body.tags) {
-            var tags_list = (req.body.tags).split(",")
-            for (var tag = 0; tag < tags_list.length; tag++) {
-                tags.push((tags_list[tag]).replace(/ /g, ""))
-            }
-        }
-        categories.update({
-                _id: req.params.id
-            }, {
-                $set: {
-                    question: req.body.question,
-                    answer: (req.body.answer).toString(),
-                    tags: tags
-                }
-            }).then(updateCategory =>
-                res.json(updateCategory)
-            )
-            .catch(err => {
-                res.json(err)
-            })
-    })
 
     // GET DATA BY TAG NAME
     app.get('/:adminID/tags/:tag', (req, res) => {
         var tagName = req.params.tag
         var adminID = req.params.adminID
-        console.log(adminUsername)
+        // console.log(adminUsername)
         if (adminUsername) {
-            categories.aggregate(
+            Technical_tags.aggregate(
                 [{
                     $match: {
                         tags: tagName,
                         adminId: adminID
                     }
-                }]
-            ).
-            then(data =>
-                    res.json(data)
-                )
-                .catch(err => {
-                    res.json(err)
+                }],
+                function (err, data) {
+                    if (err) throw err;
+                    console.log('......................................')
+                    console.log(data)
+                    categories.aggregate(
+                        [{
+                            $match: {
+                                technical_tagName: data[0].technical_tagName,
+                                adminId: adminID
+                            }
+                        }],
+                        function (err, cat_data) {
+                            if (err) throw err;
+                            console.log(cat_data)
+                            res.json(cat_data)
+                        })
+
                 })
+
         } else {
             res.render("adminloginPage")
         }
@@ -477,19 +661,77 @@ module.exports = function (app) {
 
     // DELETE CATEGORY BY ID
     app.delete('/categoryID/:id', (req, res) => {
-        console.log(adminUsername)
-        categories.deleteOne({
-                _id: req.params.id
-            }).then(updateCategory =>
-                res.json(updateCategory)
-            )
-            .catch(err => {
-                res.json(err)
+        console.log(admin_userId)
+        categories.findOne({_id: req.params.id},function(err,result){
+            if(err) throw err;
+            const techname = result.technical_tagName
+            Technical_tags.findOne({adminID:admin_userId,technical_tagName:techname,category_name:result.category_name},function(err,tagval){
+                if(err) throw err;
+                console.log(tagval._id)
+                categories.deleteOne({
+                    _id: req.params.id
+                },function(err,data){
+                    if(err) throw err;
+                    Technical_tags.deleteOne({
+                        _id: tagval._id
+                    },function(err,tagdata){
+                        if(err) throw err;
+                        res.json(tagdata)
+                    })
+                })
             })
+        })
+    })
+
+    app.post('/technicalTag',function(req,res){
+        const technical_tagName = req.body.technical_tagName
+        const category_name = req.body.category_name
+        const adminID = req.body.adminID
+        console.log(technical_tagName)
+        console.log(category_name)
+        console.log(adminID)
+        Technical_tags.aggregate(
+            [{
+                $match: {
+                    technical_tagName: technical_tagName,
+                    adminId: adminID,
+                    category_name:category_name
+                }
+            }],
+            function (err, tagData) {
+                if(err) throw err;
+                // console.log(data)
+                categories.aggregate(
+                    [{
+                        $match: {
+                            technical_tagName: technical_tagName,
+                            adminId: adminID,
+                            category_name:category_name
+                        }
+                    }],
+                    function (err, categorydata) {
+                        if(err) throw err;
+                        // console.log(category_data)
+                        const finalCategory = {
+                            _id: categorydata[0]._id,
+                            category_name: categorydata[0].category_name,
+                            question: categorydata[0].question,
+                            answer: categorydata[0].answer,
+                            technical_tagName: categorydata[0].technical_tagName,
+                            tags: tagData[0].tags,
+                            adminId: adminID,
+                            __v: 0
+                        }
+                        console.log(finalCategory)
+                        res.json(finalCategory)
+                    })
+            })
+
     })
 
     app.get('/adminLogout', (req, res) => {
-        adminUsername = ""
+        adminUsername = "";
+        admin_userId = ""
         res.render('adminloginPage')
     })
 
@@ -547,15 +789,18 @@ module.exports = function (app) {
     app.post('/verifyOrder', (req, res) => {
 
         // STEP 7: Receive Payment Data
+        console.log(req.body)
         const {
             order_id,
             payment_id,
             signature
         } = req.body;
+
         const razorpay_signature = signature;
 
         // Pass yours key_secret here
-        const key_secret = 'c9uW8hNPY33pmIWzeoSY0vZP';
+        // const key_secret = 'c9uW8hNPY33pmIWzeoSY0vZP'; //original
+        const key_secret = 'e9jv1rohg1D2bWB0DAio3amJ'; // testing
 
         // STEP 8: Verification & Send Response to User
 
@@ -568,46 +813,56 @@ module.exports = function (app) {
         // Creating the hmac in the required format
         const generated_signature = hmac.digest('hex');
 
-
+        console.log(razorpay_signature)
+        console.log(generated_signature)
         if (razorpay_signature === generated_signature) {
             sessions = req.session
             // PAYMENT CHANGED FROM FALSE TO TRUE
-            userLogincredential.update({
-                'useremail': userProfile.emails[0].value
-            }, {
-                $set: {
-                    'payment': true
-                }
-            }, function (err, data) {
-                if (err) throw err;
-                console.log('UPDATE QUERY =' + data)
-                res.json({
-                    success: true,
-                    message: "Payment has been verified"
-                })
+            // userLogincredential.update({
+            //     'useremail': userProfile.emails[0].value
+            // }, {
+            //     $set: {
+            //         'payment': true
+            //     }
+            // }, function (err, data) {
+            //     if (err) throw err;
+            //     console.log('UPDATE QUERY =' + data)
+            //     res.json({
+            //         success: true,
+            //         message: "Payment has been verified"
+            //     })
+            // })
+            res.json({
+                success: true,
+                message: "Payment has been verified"
             })
         } else {
             // PAYMENT DID'NT CHANGED
-            userLogincredential.update({
-                'useremail': userProfile.emails[0].value
-            }, {
-                $set: {
-                    'payment': false
-                }
-            }, function (err, data) {
-                if (err) throw err;
-                console.log('UPDATE QUERY for PAYMENT DIDNT CHANGED =' + data)
-                res.json({
-                    success: true,
-                    message: "Payment has been verified"
-                })
+            // userLogincredential.update({
+            //     'useremail': userProfile.emails[0].value
+            // }, {
+            //     $set: {
+            //         'payment': false
+            //     }
+            // }, function (err, data) {
+            //     if (err) throw err;
+            //     console.log('UPDATE QUERY for PAYMENT DIDNT CHANGED =' + data)
+            //     res.json({
+            //         success: true,
+            //         message: "Payment has been verified"
+            //     })
+            // })
+            res.json({
+                success: false,
+                message: "Payment not verified"
             })
         }
     });
 
-        // SUBSCRIPTION PLAN....................
+    // SUBSCRIPTION PLAN....................
 
-    app.get('/subscriptionPlan',(req,res) => {
+    app.get('/subscriptionPlan', (req, res) => {
+        console.log('G DETAIL SUBPLAN = ' + userProfile)
         res.render('subscriptionPlan')
     })
 
@@ -626,10 +881,10 @@ module.exports = function (app) {
                 amount: 100,
                 currency: "INR"
             }
-        },(err,responce) => {
-            if(err){
+        }, (err, responce) => {
+            if (err) {
                 console.log(err)
-            }else{
+            } else {
                 res.json(responce)
             }
         })
@@ -643,32 +898,29 @@ module.exports = function (app) {
         })
         console.log('PLAN ID =' + req.body.id)
         var plan_id = req.body.id
-        let experiy_date = Math.floor(new Date('2022.06.28').getTime() / 1000)
+        let experiy_date = Math.floor(new Date('2022.06.30').getTime() / 1000)
         instance.subscriptions.create({
             plan_id: req.body.id,
             customer_notify: 1,
             total_count: 6,
-            expire_by:experiy_date,
-            addons: [
-              {
+            expire_by: experiy_date,
+            addons: [{
                 item: {
-                  name: "Delivery charges",
-                  amount: 100,
-                  currency: "INR"
+                    name: "Delivery charges",
+                    amount: 100,
+                    currency: "INR"
                 }
-              }
-            ]
-          },(err,responce) => {
-            if(err){
+            }]
+        }, (err, responce) => {
+            if (err) {
                 console.log(err)
-            }else{
-                console.log('logedIN =' +userProfile)
+            } else {
                 userLogincredential.update({
                     'useremail': userProfile.emails[0].value
                 }, {
                     $set: {
                         'plan_id': plan_id,
-                        'subscriptions_id':responce.id
+                        'subscriptions_id': responce.id
                     }
                 }, function (err, data) {
                     if (err) throw err;
@@ -676,8 +928,41 @@ module.exports = function (app) {
                     res.json(responce)
                 })
 
+                // console.log('SUB = ' + responce)
+                // res.json(responce)
             }
         })
     })
-    
+
+    app.post('/verifypayment', (req, res) => {
+        const razorpay_payment_id = req.body.payment_id
+        const razorpay_signature = req.body.signature
+
+        userLogincredential.findOne({
+            useremail: userProfile.emails[0].value
+        }, function (err, data) {
+            if (err) throw err;
+            console.log('PAYEMNT = ' + data.subscriptions_id)
+            const subscription_id = data.subscriptions_id
+            var secret = "e9jv1rohg1D2bWB0DAio3amJ"
+            // generated_signature = hmac_sha256(razorpay_payment_id + "|" + subscription_id, secret);
+            let hmac = crypto.createHmac('sha256', secret);
+            hmac.update(subscription_id + "|" + razorpay_payment_id);
+            const generated_signature = hmac.digest('hex');
+            console.log(generated_signature)
+            console.log(razorpay_signature)
+            if (generated_signature == razorpay_signature) {
+                res.json({
+                    success: true
+                })
+            } else {
+                res.json({
+                    success: false
+                })
+            }
+        })
+    })
+
+
+
 }
