@@ -91,7 +91,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #tech_role_selection{
-  margin-top: 8px;
+  margin-top: 35px;
 }
 
 /* editor */
@@ -104,10 +104,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .job_role {
-  position: relative;
-    top: 58px;
-    left: 420px;
-    font-weight: bold;
+  position: absolute;
+  top: 112px;
+  left: 420px;
+  font-weight: bold;
 }
 
 .contact_div {
