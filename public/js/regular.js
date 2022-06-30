@@ -19,7 +19,7 @@ const techValue = () => {
         for (var i = 0; i < output.length; i++) {
           var categoryId = (output[i]._id).toString()
           const showTechtags = {
-            tagID : output[i].category_name + "_" + output[i].technical_tagName,
+            tagID : output[i].category_name + "_" + output[i].adminId,
             techTag: output[i].technical_tagName
           }
           technical_tags.push(showTechtags)
@@ -34,7 +34,7 @@ const techValue = () => {
         }
         console.log(technical_tags)
         for (var j = 0; j < technical_tags.length; j++) {
-          tech_tags += `<li ><a class="single_tag" id="${technical_tags[j].tagID}" >${technical_tags[j].techTag}</a></li>`
+          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}_${[j]}" >${technical_tags[j].techTag}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -141,7 +141,7 @@ $('.tags_filter').on('click', function (event) {
     contentType: "application/json",
     data: JSON.stringify({
       category_name: category_name,
-      technical_tagName:technical_tagName,
+      technical_tagName:tag_val.innerHTML,
     }),
     success: function (output) {
       console.log(output)
