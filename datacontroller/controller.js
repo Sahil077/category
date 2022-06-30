@@ -898,7 +898,7 @@ module.exports = function (app) {
         })
         console.log('PLAN ID =' + req.body.id)
         var plan_id = req.body.id
-        let experiy_date = Math.floor(new Date('2022.06.30').getTime() / 1000)
+        let experiy_date = Math.floor(new Date('2022.09.01').getTime() / 1000)
         instance.subscriptions.create({
             plan_id: req.body.id,
             customer_notify: 1,
