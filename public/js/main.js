@@ -2,7 +2,7 @@ const techValue = () => {
   const role_id = document.getElementById('techValue').value
   const adminID = (window.location.href).split('admin/')[1]
   // let url = `https://intadmin.herokuapp.com/categoryName/${category_value}`
-  let url = `https://interviewhelp.me/categoryName/${adminID}/${role_id}`
+  let url = `https://interviewhelp.me/jobrole/${adminID}/${role_id}`
   // let url = `http://localhost:3000/jobrole/${adminID}/${role_id}`
   $.ajax({
     type: 'GET',
