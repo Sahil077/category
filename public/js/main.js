@@ -1,9 +1,9 @@
 const techValue = () => {
-  const category_value = document.getElementById('techValue').value
+  const role_id = document.getElementById('techValue').value
   const adminID = (window.location.href).split('admin/')[1]
   // let url = `https://intadmin.herokuapp.com/categoryName/${category_value}`
-  let url = `https://interviewhelp.me/categoryName/${adminID}/${category_value}`
-  // let url = `http://localhost:3000/categoryName/${adminID}/${category_value}`
+  let url = `https://interviewhelp.me/categoryName/${adminID}/${role_id}`
+  // let url = `http://localhost:3000/jobrole/${adminID}/${role_id}`
   $.ajax({
     type: 'GET',
     url: url,
@@ -17,31 +17,35 @@ const techValue = () => {
         var tags_str = ""
         var tech_tags = ""
         const technical_tags = []
+        const sub_tags = []
         for (var i = 0; i < output.length; i++) {
-          var categoryId = (output[i]._id).toString()
+          // var categoryId = (output[i]._id).toString()
           console.log(output[i])
           const showTechtags = {
-            tagID : output[i].category_name + "_" + output[i].adminId,
-            techTag: output[i].technical_tagName
+            tagID : output[i].technicalTag_id + "_" + output[i].adminID,
+            techTag: output[i].technicalTagname
           }
           technical_tags.push(showTechtags)
-          // var edit_div = 'question_div' + [i]
-          str += `<div class="row mb-4 edit_div">
-                      <div class="form-group col-10 question_block" id="${output[i]._id}">
-                          ${output[i].question} 
-                      </div>
-                      <div class="form-group col-2">
-                          <i class="fas fa-edit edit-logo" id="${categoryId}"></i>
-                          <i class="fas fa-trash delete-logo" id="${categoryId}"></i>
-                      </div>   
-                    </div>`
-          for (var j = 0; j < (output[i].tags).length; j++) {
-            tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
-          }
+          for (var j = 0; j < (output[i].subTags).length; j++) {
+            const showSubtags = {
+              tagID : output[i].adminID +'_'+output[i].Jobrole_ID+ '_'+output[i].subTags[j] ,
+              techTag: output[i].subTags[j]
+            }
+            sub_tags.push(showSubtags)
         }
-        console.log(technical_tags)
-        for (var j = 0; j < technical_tags.length; j++) {
-          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}_${[j]}" >${technical_tags[j].techTag}</a></li>`
+      }
+      const idsub = sub_tags.map(o => o.tagID)
+      const filteredsub = sub_tags.filter(({tagID}, index) => !idsub.includes(tagID, index + 1))
+      console.log(filteredsub)
+      for (var k = 0; k < filteredsub.length; k++) {
+      tags_str += `<li><a class="tag" id= "${filteredsub[k].tagID}">${filteredsub[k].techTag}</a></li>`
+    }
+      // 
+        const ids = technical_tags.map(o => o.tagID)
+        const filtered = technical_tags.filter(({tagID}, index) => !ids.includes(tagID, index + 1))
+        // console.log(filtered)
+        for (var j = 0; j < filtered.length; j++) {
+          tech_tags += `<li><a class="single_tag" id="${filtered[j].tagID}" >${filtered[j].techTag}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -86,7 +90,7 @@ const editQuestion = (targetElement) => {
 }
 
 const deleteQuestion = (targetElement) => {
-
+  console.log(targetElement)
   let url = `https://interviewhelp.me/categoryID/${targetElement}`
   // let url = `http://localhost:3000/categoryID/${targetElement}`
   $.ajax({
@@ -105,20 +109,28 @@ const deleteQuestion = (targetElement) => {
 $('.tags').on('click', function (event) {
   const tag_val = event.target;
   var css_id = (tag_val.id)
-  console.log('CSS_ID = ' + css_id)
+  console.log('= ' + css_id)
   var split_id = (tag_val.id).split('_')[0]
   console.log('SPLIT_ID = ' + split_id)
   const adminID = (window.location.href).split('admin/')[1]
+  const jobRoleid = (tag_val.id).split('_')[1]
+  const subtagName = (tag_val.id).split('_')[2]
   // before
   $('.tag').css('background-color', '#e3edf9');
   // after
   $('#' + css_id).css('background-color', '#8aa9c6');
-  let url = `https://interviewhelp.me/${adminID}/tags/${split_id}`
-  // let url = `http://localhost:3000/${adminID}/tags/${split_id}`
+  let url = `https://interviewhelp.me/${adminID}/subtags/`
+  // let url = `http://localhost:3000/${adminID}/subtags/`
   console.log(url)
   $.ajax({
-    type: 'GET',
+    type: 'POST',
     url: url,
+    contentType: "application/json",
+    data: JSON.stringify({
+      jobRoleid: jobRoleid,
+      subtagName:subtagName,
+      adminID:adminID
+    }),
     success: function (output) {
         console.log(output);
       $('.question_section').empty();
@@ -126,15 +138,15 @@ $('.tags').on('click', function (event) {
       if (output.length > 0) {
         var str = ""
         for (var i = 0; i < output.length; i++) {
-          var categoryId = (output[i]._id).toString()
+          var questionId = (output[i]._id).toString()
           // var edit_div = 'question_div' + [i]
           str += `<div class="row mb-4 edit_div">
                     <div class="form-group col-10 question_block" id="${output[i]._id}">
                         ${output[i].question} 
                     </div>
                     <div class="form-group col-2">
-                    <i class="fas fa-edit edit-logo" id="${categoryId}"></i>
-                    <i class="fas fa-trash delete-logo" id="${categoryId}"></i>
+                    <i class="fas fa-edit edit-logo" id="${questionId}"></i>
+                    <i class="fas fa-trash delete-logo" id="${questionId}"></i>
                     </div>   
                   </div>`
         }
@@ -204,12 +216,10 @@ $('.question_section').on('click', function (event) {
     type: 'GET',
     url: url,
     success: function (output) {
-      console.log('categoryID API SUCCESS')
-      if (output.answer == '') {
-        $('#answer_value').text('No answer given')
-      } else {
+      console.log('categoryID API SUCCESS' + JSON.stringify(output))
+     
         $("#modal-body").append(output.answer)
-      }
+      
       $('#answerCard').modal('show');
     },
     error: function (err) {
@@ -234,7 +244,7 @@ $('.tags_filter').on('click', function (event) {
     // after
   $('#' + subTag_id).css('background-color', '#8aa9c6');
 
-  const category_name = subTag_id.split("_")[0]
+  const technicalTag_id = subTag_id.split("_")[0]
   const adminID = subTag_id.split("_")[1]
   const technical_tagName = tag_val.innerHTML
   // console.log()
@@ -245,35 +255,39 @@ $('.tags_filter').on('click', function (event) {
     url: url,
     contentType: "application/json",
     data: JSON.stringify({
-      category_name: category_name,
+      technicalTag_id: technicalTag_id,
       technical_tagName:technical_tagName,
       adminID:adminID
     }),
     success: function (output) {
-      // console.log(output)
-      $('.question_section').empty();
-      $('.tags').empty();
       if (output) {
-        var str = ""
+        console.log(output)
         var tags_str = ""
-        // for (var i = 0; i < output.length; i++) {
-          var categoryId = (output._id).toString()      
-
-          str += `<div class="row mb-4 edit_div">
-                      <div class="form-group col-10 question_block" id="${output._id}">
-                          ${output.question} 
-                      </div>
-                      <div class="form-group col-2">
-                          <i class="fas fa-edit edit-logo" id="${categoryId}"></i>
-                          <i class="fas fa-trash delete-logo" id="${categoryId}"></i>
-                      </div>   
-                    </div>`
-          for (var j = 0; j < (output.tags).length; j++) {
-            tags_str += `<li id= "${[j]}"><a class="tag" id= "${output.tags[j]+'_'+[j]}">${output.tags[j]}</a></li>`
+        // ----------------/---------------------------------------------------
+          // $('.question_section').empty();
+          $('.tags').empty();
+          // $('.tags_filter').empty();
+          var tags_str = ""
+          const sub_tags = []
+          for (var i = 0; i < output.length; i++) {
+            for (var j = 0; j < (output[i].sub_tags).length; j++) {
+              const showSubtags = {
+                tagID : output[i].adminID +'_'+output[i].Jobrole_ID+ '_'+output[i].sub_tags[j] ,
+                techTag: output[i].sub_tags[j]
+              }
+              sub_tags.push(showSubtags)
           }
-        // }
-      //  console.log(str)
-        $('.question_section').append(str)
+        }
+        const idsub = sub_tags.map(o => o.tagID)
+        const filteredsub = sub_tags.filter(({tagID}, index) => !idsub.includes(tagID, index + 1))
+        console.log(filteredsub)
+        for (var k = 0; k < filteredsub.length; k++) {
+        tags_str += `<li><a class="tag" id= "${filteredsub[k].tagID}">${filteredsub[k].techTag}</a></li>`
+      }
+
+
+        // ----------------------------------------------------------------------
+        // $('.question_section').append(str)
         $('.tags').append(tags_str)
         $('.select_Category').hide()
         // console.log(str)
@@ -289,3 +303,17 @@ $('.tags_filter').on('click', function (event) {
     }
   });
 })
+
+function todayDate(){
+  var now = new Date();
+ 
+  var day = ("0" + now.getDate()).slice(-2);
+  var month = ("0" + (now.getMonth() + 1)).slice(-2);
+
+  var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+
+
+ $('#date').val(today);
+}
+
+todayDate()
