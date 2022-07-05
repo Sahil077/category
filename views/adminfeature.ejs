@@ -1,106 +1,141 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+
+  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
     tinymce.init({
-        selector: '#myTextarea',
-        width: '100%',
-        height: 324
+      selector: '#myTextarea',
+      width: '100%',
+      height: 324
     });
-    </script>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-light" style="margin-bottom: 24px !important;">
-      <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-            <a class="nav-link active" aria-current="page" href="/categories/admin/<%= adminId %>">Home</a>
-            <a class="nav-link" href="/admin/newfeature/<%= adminId %>">Add features</a>
-            <a class="nav-link" href="/adminLogout">Logout</a>
-          </div>
+  </script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-light" style="margin-bottom: 24px !important;">
+    <div class="container-fluid">
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link active" aria-current="page" href="/categories/admin/<%= adminId %>">Home</a>
+          <a class="nav-link" href="/admin/newfeature/<%= adminId %>">Add features</a>
+          <a class="nav-link" href="/adminLogout">Logout</a>
         </div>
       </div>
-    </nav>
+    </div>
+  </nav>
 
 
-    <section>
-        <div class="container">
-            <!-- <%= updateValue %> -->
-            <% if(!updateValue){ %>
-            <form action="/create/category" method="post">
-              <% }else { %>
-            <form>
-              <% } %>
-              <% if(!updateValue){ %>
-                <div class="mb-3">
-                  <label class="form-label">Job Roles</label>
-                  <input type="text" class="form-control" value="<%= updateValue.category_name == '' ? '' : updateValue.category_name  %>" id="category_name" name="category_name" required>
-                </div>
-                <% }%>
-               
-                <input type="hidden" value="<%= adminId %>" name="adminId" id="adminId">
-                <% if(updateValue){ %>
-                <input type="hidden" value="<%= technical_tag_id %>" name="technical_tag_id" id="technical_tag_id">
-                <% }%>
-                <div class="mb-3">
-                  <label class="form-label">Question</label>
-                  <input type="text" value="<%= updateValue.question == '' ? '' : updateValue.question  %>" class="form-control" id="question" name="question">
-                </div>
-                <% if(!updateValue){ %>
-                  <div class="mb-3">
-                    <label class="form-label">Answer</label>
-                    <textarea name="myTextarea" id="myTextarea">
-                     
+  <section>
+    <div class="container">
+      <!-- <%= updateValue %> -->
+      <% if(!updateValue){ %>
+      <form action="/create/category" method="post">
+        <% }else { %>
+        <form>
+          <% } %>
+          <% if(!updateValue){ %>
+          <div class="mb-3">
+            <label class="form-label">Job Roles</label>
+            <!-- <input type="text" class="form-control" value="<%= updateValue.category_name == '' ? '' : updateValue.category_name  %>" id="category_name" name="category_name" required> -->
+            <select id="category_name" name="category_name" required class="form-select js-example-tags" style="width: 100%;">
+              <option selected>Select Job Role</option>
+            <%  jobRoles.forEach(function(roles){ %>
+                <option value="<%= roles %>"><%= roles %></option>
+             <% }) %>
+            </select>
+    
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Technical Tag</label>
+            <!-- <input type="text" value="<%= updateValue.technical_tagName == '' ? '' : updateValue.technical_tagName  %>"
+              class="form-control" id="technicalTag" name="technicalTag" required> -->
+              <select id="technicalTag" name="technicalTag" required class="form-select js-technical-tags" style="width: 100%;">
+                <option selected>Select Technical Tag</option>
+              <%  tech_tags.forEach(function(tag){ %>
+                  <option value="<%= tag %>"><%= tag %></option>
+               <% }) %>
+              </select>
+          </div>
+          <% }%>
+
+
+          <input type="hidden" value="<%= adminId %>" name="adminId" id="adminId">
+         
+          <div class="mb-3">
+            <label class="form-label">Question</label>
+            <input type="text" value="<%= updateValue.question == '' ? '' : updateValue.question  %>"
+              class="form-control" id="question" name="question">
+          </div>
+          <% if(!updateValue){ %>
+          <div class="mb-3">
+            <label class="form-label">Answer</label>
+            <textarea name="myTextarea" id="myTextarea">
+
                     </textarea>
-                    <!-- <input type="text" value="<%= updateValue.answer == '' ? '' : updateValue.answer  %>" class="form-control" id="answer" name="answer"> -->
-                  </div>
-                  <%} else{ %>
-                    <div class="mb-3">
-                      <label class="form-label">Answer</label>
-                      <textarea name="myTextarea" id="myTextarea">
+            <!-- <input type="text" value="<%= updateValue.answer == '' ? '' : updateValue.answer  %>" class="form-control" id="answer" name="answer"> -->
+          </div>
+          <%} else{ %>
+          <div class="mb-3">
+            <label class="form-label">Answer</label>
+            <textarea name="myTextarea" id="myTextarea">
                         <%= updateValue.answer  %>
                       </textarea>
-                      <!-- <input type="text" value="<%= updateValue.answer == '' ? '' : updateValue.answer  %>" class="form-control" id="answer" name="answer"> -->
-                    </div>
-                <% } %>
+            <!-- <input type="text" value="<%= updateValue.answer == '' ? '' : updateValue.answer  %>" class="form-control" id="answer" name="answer"> -->
+          </div>
+          <% } %>
 
-                <div class="mb-3">
-                  <label class="form-label">Technical Tag</label>
-                  <input type="text" value="<%= updateValue.technical_tagName == '' ? '' : updateValue.technical_tagName  %>" class="form-control" id="technicalTag" name="technicalTag" required>
-                </div>
+          <div class="mb-3">
+            <label class="form-label">Sub-tags</label>
+            <input type="text" value="<%= updateValue.tags == '' ? '' : updateValue.tags  %>" class="form-control"
+              id="tags" name="tags" required>
+            <span style="color: red;">Add tags with (',') sepration. For example:- Android , Ios</span>
+          </div>
+          <% if(!updateValue){ %>
+          <div class="mb-3">
+            <label class="form-label">Created Date</label>
+            <input type="date" disabled class="form-control" id="date" name="date" required>
+          </div> 
+          <%} %>
+          <% if(!updateValue){ %>
+          <button type="submit" class="btn btn-primary">Create</button>
+          <% }else { %>
+          <input type="button" class="btn btn-primary " id="<%=updateValue._id %>"
+            onclick="update_category('<%=updateValue._id %>')" value="Update">
+          <% } %>
 
-                  <div class="mb-3">
-                    <label class="form-label">Sub-tags</label>
-                    <input type="text" value="<%= updateValue.tags == '' ? '' : updateValue.tags  %>" class="form-control" id="tags" name="tags" required>
-                    <span style="color: red;">Add tags with (',') sepration. For example:- Android , Ios</span>
-                  </div>
-                  <% if(!updateValue){ %>
-                    <div class="mb-3">
-                        <label class="form-label">Created Date</label>
-                        <input type="date" class="form-control" id="date" name="date" required>
-                      </div>
-                  <%} %> 
-                  <% if(!updateValue){ %>
-                    <button type="submit" class="btn btn-primary">Create</button>
-                  <% }else { %>
-                      <input type="button" class="btn btn-primary " id="<%=updateValue._id %>" onclick="update_category('<%=updateValue._id %>')" value="Update">
-                  <% } %>
-               
-              </form>
-             
-        </div>
-    </section>
+        </form>
 
-    <script src="/js/main.js"></script>
+    </div>
+  </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
-  </body>
+  <script src="/js/main.js"></script>
+  <script>
+    $(".js-example-tags").select2({
+      tags: true,
+      theme: "classic"
+    });
+
+    $(".js-technical-tags").select2({
+      tags: true,
+      theme: "classic"
+    })
+
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
+  </script>
+</body>
+
 </html>
