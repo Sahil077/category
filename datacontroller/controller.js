@@ -10,26 +10,43 @@ mongoose.connect("mongodb+srv://intadmin:intramin123@cluster0.2hbsso0.mongodb.ne
     useUnifiedTopology: true
 });
 
-const categorySchema = new mongoose.Schema({
+const jobRoleSchema = new mongoose.Schema({
     category_name: String,
-    question: String,
-    answer: String,
-    technical_tagName: String,
     created_at: Date,
     adminId: String
 
 })
 
-const categories = mongoose.model("categories", categorySchema);
+const Jobrole = mongoose.model("Jobrole", jobRoleSchema);
 
-const tagsSchema = new mongoose.Schema({
+const technicalTagSchema = new mongoose.Schema({
     technical_tagName: String,
-    tags: [],
     adminId: String,
-    category_name:String
+    Jobrole_ID:String
 })
 
-const Technical_tags = mongoose.model("tags", tagsSchema);
+const TechnicalTags = mongoose.model("TechnicalTags", technicalTagSchema);
+
+const QuestionAnswerSchema = new mongoose.Schema({
+    question: String,
+    answer:String,
+    adminId: String,
+    Jobrole_ID:String,
+    technicalTag_ID:String
+})
+
+const QuestionAnswer = mongoose.model("QuestionAnswer", QuestionAnswerSchema);
+
+
+const subTagsSchema = new mongoose.Schema({
+    sub_tags:[],
+    adminId: String,
+    Jobrole_ID:String,
+    technicalTag_ID:String,
+    QuestionAnswer_ID:String
+})
+
+const SubTags = mongoose.model("SubTags", subTagsSchema);
 
 const adminSchema = new mongoose.Schema({
     username: String,
@@ -65,12 +82,13 @@ var admin_userId;
 
 const GOOGLE_CLIENT_ID = '65610686925-bko50g7l2c7hrkqqcpvadi3hitv6ito3.apps.googleusercontent.com';
 const GOOGLE_CLIENT_SECRET = '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';
-
+// const GOOGLE_CLIENT_ID = '617974857461-1j81j345gfd1ctlthqlvmh4kccjnirfq.apps.googleusercontent.com';
+// const GOOGLE_CLIENT_SECRET = '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';
 passport.use(new GoogleStrategy({
         clientID: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
         callbackURL: "https://interviewhelp.me/auth/google/callback",
-       
+        // callbackURL: "http://localhost:3000/auth/google/callback",
         scope: ['profile', 'email'],
     },
     function (accessToken, refreshToken, profile, done) {
@@ -181,7 +199,8 @@ module.exports = function (app) {
     // Get single Category by ID
     app.get('/categoryID/:id', (req, res) => {
         // console.log('categoryID API HIT')
-        categories.findOne({
+        console.log(req.params.id)
+        QuestionAnswer.findOne({
             _id: req.params.id
         }).
         then(updateCategory => res.json(updateCategory))
@@ -213,7 +232,7 @@ module.exports = function (app) {
 
     // update category by category id
     app.put('/categoryID/:id', (req, res) => {
-        console.log((req.body))
+        console.log('data ============= ' + JSON.stringify(req.body))
         var tags = []
         if (req.body.tags) {
             var tags_list = (req.body.tags).split(",")
@@ -221,27 +240,25 @@ module.exports = function (app) {
                 tags.push((tags_list[tag]).replace(/ /g, ""))
             }
         }
-
-        categories.update({
+        QuestionAnswer.update({
             _id: req.params.id
         }, {
             $set: {
                 question: req.body.question,
                 answer: (req.body.answer).toString(),
-                // tags: tags
             }
-        }, function (err, updatedCategory) {
+        }, function (err, updatedQuestions) {
             if (err) throw err;
-            Technical_tags.update({
-                _id: req.body.technical_tag_id
+            SubTags.update({
+                QuestionAnswer_ID: req.params.id
             }, {
                 $set: {
-                    technical_tagName: req.body.technical_tagName,
-                    tags: tags
+                    sub_tags: tags
                 }
             }, function (err, updatedTags) {
                 if (err) throw err;
-                res.json(updatedCategory)
+                console.log(updatedTags)
+                res.json(updatedQuestions)
             })
         })
     })
@@ -445,18 +462,22 @@ module.exports = function (app) {
     // HOME PAGHE FOR ADMIN
     app.get('/categories/admin/:adminId', (req, res) => {
         const tech_list = [];
-        // console.log(adminUsername)
+        console.log(adminUsername  + '466')
         if (adminUsername) {
-            categories.find({
-                adminId: req.params.adminId
+            Jobrole.find({
+                // adminId: req.params.adminId
             }, (err, data) => {
                 if (err) throw err;
                 for (i = 0; i < data.length; i++) {
-                    tech_list.push(data[i].category_name);
+                    // tech_list.push(data[i].category_name);
+                    tech_list.push({
+                        role:data[i].category_name,
+                        role_id:data[i]._id
+                    })
                 }
-                const tech_name = Array.from(new Set(tech_list));
-                res.render('home', {
-                    techList: tech_name,
+                
+                res.render('home', { 
+                    techList: tech_list,
                     adminId: req.params.adminId
                 })
             })
@@ -468,96 +489,163 @@ module.exports = function (app) {
     // Create category
     app.post('/create/category', async (req, res) => {
         var tags = []
+        console.log(req.body.tags)
         var tags_list = (req.body.tags).split(",")
         for (var tag = 0; tag < tags_list.length; tag++) {
             tags.push((tags_list[tag]).replace(/ /g, ""))
         }
         const adminId = req.body.adminId
-        await new categories({
-            category_name: req.body.category_name,
-            question: req.body.question,
-            answer: (req.body.myTextarea).toString(),
-            technical_tagName: req.body.technicalTag,
-            created_at: req.body.date,
-            adminId: req.body.adminId
-        }).save(function (err, data) {
-            if (err) {
-                res.sendStatus(400);
-            } else {
-                new Technical_tags({
-                    technical_tagName: req.body.technicalTag,
-                    tags: tags,
-                    adminId: req.body.adminId,
-                    category_name: req.body.category_name
-                }).save(function (err, data) {
-                    if (err) {
-                        res.sendStatus(400);
-                    } else {
-                        res.redirect(`/categories/admin/${adminId}`);
-                    }
-                });
+    
+        Jobrole.findOne({category_name: req.body.category_name,
+            // adminId: req.body.adminId
+        },function(err,jobrolePresent){
+            if(err) throw err;
+            var jobrolePresent_id = ''
+            var TechnicalTagsPresent_id = ''
+            var QuestionAnswerPresent_id = ''
+            if(jobrolePresent){
+                console.log('----------- old '+ jobrolePresent)
+                jobrolePresent_id = (jobrolePresent._id).toString() 
             }
-        });
+            if(!jobrolePresent){
+                console.log(req.body)
+                new Jobrole({
+                    category_name: req.body.category_name,
+                    created_at: req.body.date,
+                    // adminId: req.body.adminId
+                    }).save(function (err, Jobroledata) {
+                    if (err) throw err;
+                    console.log('----------- new '+ (Jobroledata._id).toString())
+                    // console.log('----------- new '+ (Jobroledata[0]._id).toString())
+                        jobrolePresent_id = (Jobroledata._id).toString() 
+                    })
+            }
+
+            function jobLoadId (){
+             console.log('JOBID =' + jobrolePresent_id)
+            TechnicalTags.findOne({technical_tagName: req.body.technicalTag,
+                // adminId: req.body.adminId,
+                Jobrole_ID: jobrolePresent_id},function(err,TechnicalTagsPresent){
+                    if(err) throw err;
+                    if(TechnicalTagsPresent){
+                        console.log('----------- old '+ TechnicalTagsPresent)
+                        TechnicalTagsPresent_id = (TechnicalTagsPresent._id).toString() 
+                    }
+                    if(!TechnicalTagsPresent){
+                        new TechnicalTags({
+                        technical_tagName: req.body.technicalTag,
+                        // adminId: req.body.adminId,
+                        Jobrole_ID:jobrolePresent_id
+                    }).save(function (err, TechnicalTagsdata) {
+                        if (err) throw err; 
+                         console.log('----------- new '+ (TechnicalTagsdata) )
+                            TechnicalTagsPresent_id = (TechnicalTagsdata._id).toString() 
+                        })
+                    }
+                    function techtagid(){
+                    QuestionAnswer.findOne({question: req.body.question,
+                        // adminId: req.body.adminId,
+                        Jobrole_ID: jobrolePresent_id,technicalTag_ID:TechnicalTagsPresent_id},
+                            function(err,QuestionAnswerPresent){
+                                if(err) throw err;
+                                if(QuestionAnswerPresent){
+                                        new SubTags({
+                                            sub_tags:tags,
+                                            QuestionAnswer_ID:(QuestionAnswerPresent._id).toString(),
+                                            Jobrole_ID:jobrolePresent_id,
+                                            technicalTag_ID:TechnicalTagsPresent_id,
+                                            // adminId: req.body.adminId,
+                                        }).save(function (err, SubTags) {
+                                            if (err) throw err;
+                                            console.log(SubTags)
+                                            res.json('done ')
+                                            // res.redirect(`/categories/admin/${adminId}`);
+                                        });
+                                }
+                                if(!QuestionAnswerPresent){
+                                console.log('NEW jobrolePresent_id = ' + jobrolePresent_id)
+                                        console.log('NEW TechnicalTagsPresent_id = ' + TechnicalTagsPresent_id)
+                                        new QuestionAnswer({
+                                        question: req.body.question,
+                                        answer:(req.body.myTextarea).toString(),
+                                        // adminId: req.body.adminId,
+                                        Jobrole_ID:jobrolePresent_id,
+                                        technicalTag_ID:TechnicalTagsPresent_id,
+                                        // adminId: req.body.adminId,
+                                        }).save(function (err, QuestionAnswerdata) {
+                                        if (err) throw err;
+                                        new SubTags({
+                                            sub_tags:tags,
+                                            QuestionAnswer_ID:(QuestionAnswerdata._id).toString(),
+                                            Jobrole_ID:jobrolePresent_id,
+                                            technicalTag_ID:TechnicalTagsPresent_id,
+                                            // adminId: req.body.adminId,
+                                        }).save(function (err, SubTags) {
+                                            if (err) throw err;
+                                            console.log(SubTags)
+                                            // res.json('done ')
+                                            res.redirect(`/categories/admin/${adminId}`);
+                                        });
+                                        })
+                                }
+
+        })
+    }
+    setTimeout(techtagid, 80);
+        })
+    }
+    setTimeout(jobLoadId, 50);
+        })
+                        
+    
     })
 
-    // Get Categories by Name
-    app.get('/categoryName/:adminId/:category_name', (req, res) => {
-        // console.log('HERE')
+    // Get JOB ROLE by ID
+    app.get('/jobrole/:adminId/:role_id', (req, res) => {
+        console.log('HERE')
         if (adminUsername) {
-            // console.log(req.params.category_name)
-            // console.log(req.params.adminId)
-            const tag_data = []
-            categories.aggregate(
-                [{
-                    $match: {
-                        'category_name': req.params.category_name,
-                        'adminId': req.params.adminId
+            const techTag_id = []
+            const final_tagsList = []
+            TechnicalTags.aggregate([{
+                $match: {
+                    // adminId: req.params.adminId , 
+                    Jobrole_ID:req.params.role_id}
+                }],function(err,TechnicalTagsdata){
+                    if(err) throw err;
+                    // console.log(TechnicalTagsdata)
+                    for(var i=0 ; i < TechnicalTagsdata.length; i++){
+                        techTag_id.push((TechnicalTagsdata[i]._id).toString())
                     }
-                }],
-                function (err, categorydata) {
-                    if (err) throw err;
-                console.log('----------  '+ JSON.stringify(categorydata))
-                    for (var i = 0; i < categorydata.length; i++) {
-                        tag_data.push(categorydata[i].technical_tagName)
-                    }
-                    Technical_tags.aggregate([{
-                            $match: {
-                                technical_tagName: {
-                                    $in: tag_data
-                                },
-                                'adminId': req.params.adminId,
-                                'category_name': req.params.category_name
-                            }
-                        }]
-                        // Technical_tags.find({ technical_tagName: { $in: tag_data } }
-                        ,
-                        function (err, tagData) {
-                            if (err) throw err;
-                            console.log('TAG = ' + tagData)
-                            const finalValue = []
-                            // console.log('cat = ' + JSON.stringify(categorydata))
-                            for (var j = 0; j < categorydata.length; j++) {
-                                for (var tagvalue = 0; tagvalue < tagData.length; tagvalue++) {
-                                    if (categorydata[j].technical_tagName == tagData[tagvalue].technical_tagName) {
-                                        // tagDatavalue.push(tagData[tagvalue].tags)
-                                        const finalCategory = {
-                                            _id: categorydata[j]._id,
-                                            category_name: categorydata[j].category_name,
-                                            question: categorydata[j].question,
-                                            answer: categorydata[j].answer,
-                                            technical_tagName: categorydata[j].technical_tagName,
-                                            tags: tagData[tagvalue].tags,
-                                            adminId: req.params.adminId,
-                                            __v: 0
-                                        }
-                                        finalValue.push(finalCategory)
+                    // console.log(techTag_id)
+                    SubTags.aggregate([{
+                         $match: {
+                            //  'adminId': req.params.adminId , 
+                             technicalTag_ID:{$in:techTag_id}}
+                    }],function(err,subTagsdata){
+                        if(err) throw err;
+                        console.log(TechnicalTagsdata.length)
+                        for(var j=0 ; j < TechnicalTagsdata.length;j++){
+                            for(var i=0 ; i < subTagsdata.length; i++){
+                                if((TechnicalTagsdata[j]._id).toString() == subTagsdata[i].technicalTag_ID){
+                                    // console.log(TechnicalTagsdata[j].technical_tagName+  ' == ' +subTagsdata[i].technicalTag_ID)
+                                    const finaldata = {
+                                        technicalTagname:TechnicalTagsdata[j].technical_tagName,
+                                        technicalTag_id:subTagsdata[i].technicalTag_ID,
+                                        subTags:subTagsdata[i].sub_tags,
+                                        subTag_id:(subTagsdata[i]._id).toString(),
+                                        // adminID:subTagsdata[i].adminId,
+                                        QuestionAnswer_ID:subTagsdata[i].QuestionAnswer_ID,
+                                        Jobrole_ID:subTagsdata[i].Jobrole_ID
                                     }
+                                    // console.log(finaldata)
+                                    final_tagsList.push(finaldata)
                                 }
                             }
-                            res.json(finalValue)
-                        })
-
+                        }
+                        res.json(final_tagsList)
+                    })
                 })
+
         } else {
             res.render("adminloginPage")
         }
@@ -566,10 +654,28 @@ module.exports = function (app) {
     app.get("/admin/newfeature/:adminId", function (req, res) {
         // console.log(adminUsername)
         if (adminUsername) {
-            res.render('adminfeature', {
-                updateValue: "",
-                adminId: req.params.adminId
-            });
+            Jobrole.find({},function(err,roles){
+                const jobRoles = []
+                if(err) throw err;
+                for(var role =0; role < roles.length;role++){
+                    jobRoles.push(roles[role].category_name)
+                }
+                TechnicalTags.find({},function(err,techTags){
+                    const tech_tags = []
+                    if(err) throw err;
+                    for(var tag =0; tag < techTags.length;tag++){
+                        tech_tags.push(techTags[tag].technical_tagName)
+                    }
+                    console.log(jobRoles)
+                    console.log(tech_tags)
+                    res.render('adminfeature', {
+                        updateValue: "",
+                        adminId: req.params.adminId,
+                        jobRoles:jobRoles,
+                        tech_tags:tech_tags
+                    });
+                })
+            })
         } else {
             res.render("adminloginPage")
         }
@@ -577,156 +683,116 @@ module.exports = function (app) {
 
     app.get("/admin/feature/adminId/:adminId/updateID/:updateID", function (req, res) {
         // console.log(adminUsername)
+        console.log(req.params.updateID)
+        var id = req.params.updateID
         if (adminUsername) {
-            categories.findOne({
-                _id: req.params.updateID
-            }, function (err, updateCategory) {
-                if (err) throw err;
-                // console.log(updateCategory)
-                const update_technical_tag = updateCategory.technical_tagName
-                Technical_tags.aggregate([{
-                    $match: {
-                        technical_tagName: update_technical_tag,
-                        adminId: req.params.adminId
-                    }
-                }]
-                // Technical_tags.findOne({
-                //     technical_tagName: update_technical_tag
-                // }
-                , function (err, techData) {
-                    if (err) throw err;
-                    // console.log(techData)
-                    const finalCategory = {
-                        _id: updateCategory._id,
-                        category_name: updateCategory.category_name,
-                        question: updateCategory.question,
-                        answer: updateCategory.answer,
-                        technical_tagName: update_technical_tag,
-                        tags: techData[0].tags,
-                        technical_tag_id: techData[0]._id,
-                        adminId: req.params.adminId,
-                        __v: 0
-                    }
-                    console.log(finalCategory)
-                    res.render('adminfeature', {
-                        updateValue: finalCategory,
-                        adminId: req.params.adminId,
-                        technical_tag_id: finalCategory.technical_tag_id
+        QuestionAnswer.find({_id:new mongoose.Types.ObjectId(id)
+            },function(err,questionData){
+                if(err) throw err;
+                // console.log('.....------------------------')
+                // console.log(questionData)
+                SubTags.find({QuestionAnswer_ID:id},function(err,subtagData){
+                    if(err) throw err;
+                    // console.log('.....------------------------')
+                    // console.log(subtagData)
+                    Jobrole.find({_id:new mongoose.Types.ObjectId(questionData[0].Jobrole_ID)},function(err,roleData){
+                        if(err) throw err;
+                        console.log('.....------------------------')
+                        // console.log(roleData)
+                        TechnicalTags.find({_id:new mongoose.Types.ObjectId(questionData[0].technicalTag_ID)},function(err,technicaltagData){
+                            if(err) throw err;
+                            // console.log('.....------------------------')
+                            // console.log(technicaltagData)
+                            const updateData = {
+                                question:questionData[0].question,
+                                answer:questionData[0].answer,
+                                tags:subtagData[0].sub_tags,
+                                _id:new mongoose.Types.ObjectId(id)
+                            }
+                            console.log(updateData)
+                            res.render('adminfeature', {
+                                updateValue: updateData,
+                                adminId: req.params.adminId,
+                                // technical_tag_id: finalCategory.technical_tag_id
+                            })
+                        })
                     })
                 })
+            
             })
-        } else {
-            res.render("adminloginPage")
         }
     })
 
 
     // GET DATA BY TAG NAME
-    app.get('/:adminID/tags/:tag', (req, res) => {
-        var tagName = req.params.tag
-        var adminID = req.params.adminID
-        // console.log(adminUsername)
+    app.post('/:adminID/subtags', (req, res) => {
+
+        var jobRoleid = req.body.jobRoleid
+        var subtagName = req.body.subtagName
+        var adminID = req.body.adminID
+        // console.log(req.body)
         if (adminUsername) {
-            Technical_tags.aggregate(
-                [{
-                    $match: {
-                        tags: tagName,
-                        adminId: adminID
-                    }
-                }],
-                function (err, data) {
-                    if (err) throw err;
-                    console.log('......................................')
-                    console.log(data)
-                    categories.aggregate(
-                        [{
-                            $match: {
-                                technical_tagName: data[0].technical_tagName,
-                                adminId: adminID
-                            }
-                        }],
-                        function (err, cat_data) {
-                            if (err) throw err;
-                            console.log(cat_data)
-                            res.json(cat_data)
-                        })
-
+            SubTags.aggregate([
+                {$match:{
+                    sub_tags:subtagName,
+                    // adminId:adminID,
+                    Jobrole_ID:jobRoleid,
+                }}
+            ],function(err,SubtagsData){
+                if(err) throw err;
+                // console.log(SubtagsData)
+                const questionId = []
+                for(var i=0; i< SubtagsData.length;i++){
+                    questionId.push((SubtagsData[i].QuestionAnswer_ID))
+                }
+                // console.log(questionId)
+                var obj_ids = questionId.map(function(id) { return new mongoose.Types.ObjectId(id); });
+                QuestionAnswer.aggregate([
+                    {$match:{
+                        _id: {$in: obj_ids} ,
+                        // ,adminId:adminID,
+                        Jobrole_ID:jobRoleid
+                    }}
+                ],function(err,questionData){
+                    if(err) throw err;
+                    res.json(questionData)
                 })
-
-        } else {
-            res.render("adminloginPage")
+            })
         }
     })
 
 
     // DELETE CATEGORY BY ID
     app.delete('/categoryID/:id', (req, res) => {
-        console.log(admin_userId)
-        categories.findOne({_id: req.params.id},function(err,result){
+        // console.log(admin_userId)
+        
+        SubTags.deleteMany({QuestionAnswer_ID: req.params.id},function(err,result){
             if(err) throw err;
-            const techname = result.technical_tagName
-            Technical_tags.findOne({adminID:admin_userId,technical_tagName:techname,category_name:result.category_name},function(err,tagval){
+            console.log(result)
+            QuestionAnswer.deleteMany({_id: new mongoose.Types.ObjectId(req.params.id)},function(err,result){
                 if(err) throw err;
-                console.log(tagval._id)
-                categories.deleteOne({
-                    _id: req.params.id
-                },function(err,data){
-                    if(err) throw err;
-                    Technical_tags.deleteOne({
-                        _id: tagval._id
-                    },function(err,tagdata){
-                        if(err) throw err;
-                        res.json(tagdata)
-                    })
-                })
+                res.json(result)
+
             })
         })
     })
 
     app.post('/technicalTag',function(req,res){
         const technical_tagName = req.body.technical_tagName
-        const category_name = req.body.category_name
+        const technicalTag_id = req.body.technicalTag_id
         const adminID = req.body.adminID
         console.log(technical_tagName)
-        console.log(category_name)
         console.log(adminID)
-        Technical_tags.aggregate(
-            [{
-                $match: {
-                    technical_tagName: technical_tagName,
-                    adminId: adminID,
-                    category_name:category_name
-                }
-            }],
-            function (err, tagData) {
-                if(err) throw err;
-                // console.log(data)
-                categories.aggregate(
-                    [{
-                        $match: {
-                            technical_tagName: technical_tagName,
-                            adminId: adminID,
-                            category_name:category_name
-                        }
-                    }],
-                    function (err, categorydata) {
-                        if(err) throw err;
-                        // console.log(category_data)
-                        const finalCategory = {
-                            _id: categorydata[0]._id,
-                            category_name: categorydata[0].category_name,
-                            question: categorydata[0].question,
-                            answer: categorydata[0].answer,
-                            technical_tagName: categorydata[0].technical_tagName,
-                            tags: tagData[0].tags,
-                            adminId: adminID,
-                            __v: 0
-                        }
-                        console.log(finalCategory)
-                        res.json(finalCategory)
-                    })
-            })
-
+        SubTags.aggregate([
+            {$match:{
+                // adminId:adminID,
+                technicalTag_ID:technicalTag_id
+            }}
+        ],function(err,subTagsdata){
+            if(err) throw err;
+            console.log(subTagsdata)
+            res.json(subTagsdata)
+        })
     })
 
     app.get('/adminLogout', (req, res) => {
