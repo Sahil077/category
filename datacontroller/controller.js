@@ -1056,24 +1056,39 @@ module.exports = function (app) {
         // Read all catetories & HOME PAGE for REGULAR
         app.get('/categories', (req, res) => {
 
-            if (sessions) {
-                const tech_list = [];
-                Jobrole.find({}, (err, data) => {
-                    if (err) throw err;
-                    const tech_list = []
-                    for (i = 0; i < data.length; i++) {
-                        tech_list.push({
-                            role: data[i].category_name,
-                            role_id: data[i]._id
+            var instance = new Razorpay({
+                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+            })
+            var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
+            subscriptionDATA.then(meta => {
+                console.log('SUB Data = ' + JSON.stringify(meta));
+                if (meta.status == 'active') {
+                    if (sessions) {
+                        Jobrole.find({}, (err, data) => {
+                            if (err) throw err;
+                            const tech_list = []
+                            for (i = 0; i < data.length; i++) {
+                                tech_list.push({
+                                    role: data[i].category_name,
+                                    role_id: data[i]._id
+                                })
+                            }
+                            res.render('regular', {
+                                techList: tech_list
+                            })
                         })
+                    } else {
+                        res.render('auth')
                     }
-                    res.render('regular', {
-                        techList: tech_list
-                    })
-                })
-            } else {
-                res.render('auth')
-            }
+                } else {
+                    console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                    res.redirect('/subscriptionPlan')
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+                
         })
 
         app.get('/jobrole/:jobRoleid', (req, res) => {
