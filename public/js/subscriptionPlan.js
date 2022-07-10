@@ -52,7 +52,7 @@ function verifyPayment(orderDetails) {
     console.log(JSON.stringify(orderDetails))
     // KEY FOR SUBSCRIPTION PLAN CREDENTIALS
     var options = { 
-        "key": "rzp_test_umWrzSCH1vLjLL",
+        "key": "rzp_live_5V9Rr2HtEbDI2n",
         "subscription_id": orderDetails.id, 
         "name": "InterviewHelp", 
         "description": "Monthly Test Plan", 
