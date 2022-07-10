@@ -1,8 +1,8 @@
 const techValue = () => {
-  const category_value = document.getElementById('techValue').value
+  const role_id = document.getElementById('techValue').value
   // console.log(category_value)
-  let url = `https://interviewhelp.me/categoryName/${category_value}`
-  // let url = `http://localhost:3000/categoryName/${category_value}`
+  let url = `https://interviewhelp.me/Jobrole/${role_id}`
+  // let url = `http://localhost:3000/Jobrole/${role_id}`
   $.ajax({
     type: 'GET',
     url: url,
@@ -16,25 +16,28 @@ const techValue = () => {
         var tags_str = ""
         var tech_tags = ""
         const technical_tags = []
+        const sub_tags = []
         for (var i = 0; i < output.length; i++) {
-          var categoryId = (output[i]._id).toString()
+          // var categoryId = (output[i]._id).toString()
+          console.log(output[i])
           const showTechtags = {
-            tagID : output[i].category_name + "_" + output[i].adminId,
-            techTag: output[i].technical_tagName
+            tagID: (output[i]._id).toString(),
+            techTag: output[i].techTagname
           }
           technical_tags.push(showTechtags)
-          str += `<div class="row mb-4 edit_div">
-                      <div class="form-group col-10 question_block" id="${output[i]._id}">
-                          ${output[i].question} 
-                      </div> 
-                    </div>`
-          for (var j = 0; j < (output[i].tags).length; j++) {
-            tags_str += `<li id= "${[j]}"><a class="tag" id= "${output[i].tags[j]+'_'+[j]}">${output[i].tags[j]}</a></li>`
+          for (var j = 0; j < (output[i].sub_tags).length; j++) {
+            const showSubtags = {
+              subtagID: output[i].sub_tags[j].subtagId,
+              subTag: output[i].sub_tags[j].subtagname
+            }
+            sub_tags.push(showSubtags)
           }
         }
-        console.log(technical_tags)
+        for (var k = 0; k < sub_tags.length; k++) {
+          tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
+        }
         for (var j = 0; j < technical_tags.length; j++) {
-          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}_${[j]}" >${technical_tags[j].techTag}</a></li>`
+          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}" >${technical_tags[j].techTag}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -43,6 +46,8 @@ const techValue = () => {
       } else {
         $('.select_Category').show()
         $('.question_section .row').hide()
+        $('.tags .tag').hide()
+        $('.tags_filter .single_tag').hide()
       }
     },
     error: function (err) {
@@ -55,13 +60,15 @@ const techValue = () => {
 $('.tags').on('click', function (event) {
   const tag_val = event.target;
   var css_id = (tag_val.id)
-  var split_id = (tag_val.id).split('_')[0]
-    // before
-  $('.single_tag').css('background-color', '#ffffff');
-    // after
-  $('#' + subTag_id).css('background-color', '#8aa9c6');
-  let url = `https://interviewhelp.me/tags/${split_id}` 
-  // let url = `http://localhost:3000/tags/${split_id}` 
+  console.log('= ' + css_id)
+  var subtag_id = tag_val.id
+
+  // before
+  $('.tag').css('background-color', '#e3edf9');
+  // after
+  $('#' + css_id).css('background-color', '#8aa9c6');
+  let url = `https://interviewhelp.me/subtag/${subtag_id}`
+  // let url = `http://localhost:3000/subtag/${subtag_id}`
   $.ajax({
     type: 'GET',
     url: url,
@@ -97,8 +104,8 @@ $('.question_section').on('click', function (event) {
   const tag_val = event.target;
   console.log(tag_val.id)
   $('#modal-body').empty();
-  let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
-  // let url = `http://localhost:3000/categoryID/${tag_val.id}`
+  let url = `https://interviewhelp.me/QA/${tag_val.id}`
+  // let url = `http://localhost:3000/QA/${tag_val.id}`
   $.ajax({
     type: 'GET',
     url: url,
@@ -126,41 +133,33 @@ $('.tags_filter').on('click', function (event) {
   const tag_val = event.target;
   var subTag_id = tag_val.id
   console.log(subTag_id)
-      // before
-  $('.tags_filter').css('background-color', '#ffffff');
+    // before
+  $('.single_tag').css('background-color', '#ffffff');
     // after
   $('#' + subTag_id).css('background-color', '#8aa9c6');
 
-  const category_name = subTag_id.split("_")[0]
-  const technical_tagName = subTag_id.split("_")[1]
-  let url = `https://interviewhelp.me/user/technicalTag`
-  // let url = `http://localhost:3000/user/technicalTag`
+  let url = `https://interviewhelp.me/techtag/${subTag_id}`
+  // let url = `http://localhost:3000/techtag/${subTag_id}`
   $.ajax({
-    type: 'POST',
+    type: 'GET',
     url: url,
-    contentType: "application/json",
-    data: JSON.stringify({
-      category_name: category_name,
-      technical_tagName:tag_val.innerHTML,
-    }),
     success: function (output) {
       console.log(output)
       $('.question_section').empty();
       $('.tags').empty();
       if (output) {
-        var str = ""
         var tags_str = ""
-    
-          str += `<div class="row mb-4 edit_div">
-                      <div class="form-group col-10 question_block" id="${output._id}">
-                          ${output.question} 
-                      </div>   
-                    </div>`
-          for (var j = 0; j < (output.tags).length; j++) {
-            tags_str += `<li id= "${[j]}"><a class="tag" id= "${output.tags[j]+'_'+[j]}">${output.tags[j]}</a></li>`
+        const sub_tags = []
+        for (var i = 0; i < output.length; i++) {
+          const showSubtags = {
+            subtagID: (output[i]._id).toString(),
+            subTag: output[i].SubtagName
           }
-
-        $('.question_section').append(str)
+          sub_tags.push(showSubtags)
+        }
+        for (var k = 0; k < sub_tags.length; k++) {
+          tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
+        }
         $('.tags').append(tags_str)
         $('.select_Category').hide()
         // console.log(str)
