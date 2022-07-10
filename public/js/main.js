@@ -2,8 +2,9 @@ const techValue = () => {
   const role_id = document.getElementById('techValue').value
   const adminID = (window.location.href).split('admin/')[1]
   // let url = `https://intadmin.herokuapp.com/categoryName/${category_value}`
-  let url = `https://interviewhelp.me/jobrole/${adminID}/${role_id}`
-  // let url = `http://localhost:3000/jobrole/${adminID}/${role_id}`
+  let url = `https://interviewhelp.me/AdminJobrole/${adminID}/${role_id}`
+  // let url = `http://localhost:3000/AdminJobrole/${adminID}/${role_id}`
+console.log('JOB ROLE ID = ' + role_id)
   $.ajax({
     type: 'GET',
     url: url,
@@ -22,30 +23,30 @@ const techValue = () => {
           // var categoryId = (output[i]._id).toString()
           console.log(output[i])
           const showTechtags = {
-            tagID : output[i].technicalTag_id + "_" + output[i].adminID,
-            techTag: output[i].technicalTagname
+            tagID : (output[i]._id).toString(),
+            techTag: output[i].techTagname
           }
           technical_tags.push(showTechtags)
-          for (var j = 0; j < (output[i].subTags).length; j++) {
+          for (var j = 0; j < (output[i].sub_tags).length; j++) {
             const showSubtags = {
-              tagID : output[i].adminID +'_'+output[i].Jobrole_ID+ '_'+output[i].subTags[j] ,
-              techTag: output[i].subTags[j]
+              subtagID : output[i].sub_tags[j].subtagId ,
+              subTag: output[i].sub_tags[j].subtagname
             }
             sub_tags.push(showSubtags)
         }
       }
-      const idsub = sub_tags.map(o => o.tagID)
-      const filteredsub = sub_tags.filter(({tagID}, index) => !idsub.includes(tagID, index + 1))
-      console.log(filteredsub)
-      for (var k = 0; k < filteredsub.length; k++) {
-      tags_str += `<li><a class="tag" id= "${filteredsub[k].tagID}">${filteredsub[k].techTag}</a></li>`
+      // const idsub = sub_tags.map(o => o.tagID)
+      // const filteredsub = sub_tags.filter(({tagID}, index) => !idsub.includes(tagID, index + 1))
+      // console.log(filteredsub)
+      for (var k = 0; k < sub_tags.length; k++) {
+      tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
     }
       // 
-        const ids = technical_tags.map(o => o.tagID)
-        const filtered = technical_tags.filter(({tagID}, index) => !ids.includes(tagID, index + 1))
+        // const ids = technical_tags.map(o => o.tagID)
+        // const filtered = technical_tags.filter(({tagID}, index) => !ids.includes(tagID, index + 1))
         // console.log(filtered)
-        for (var j = 0; j < filtered.length; j++) {
-          tech_tags += `<li><a class="single_tag" id="${filtered[j].tagID}" >${filtered[j].techTag}</a></li>`
+        for (var j = 0; j < technical_tags.length; j++) {
+          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}" >${technical_tags[j].techTag}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -83,16 +84,17 @@ $('.question_section').on('click', function (event) {
 
 
 const editQuestion = (targetElement) => {
-  console.log(targetElement)
+  console.log(targetElement + '---------------------')
   const adminID = (window.location.href).split('admin/')[1]
-  window.open(`https://interviewhelp.me/admin/feature/adminId/${adminID}/updateID/${targetElement}`, "_self");
-  // window.open(`http://localhost:3000/admin/feature/adminId/${adminID}/updateID/${targetElement}` ,"_self");
+  console.log(adminID)
+  window.open(`https://interviewhelp.me/Admin/update/feature/${targetElement}/${adminID}`, "_self");
+  // window.open(`http://localhost:3000/Admin/update/feature/${targetElement}/${adminID}` ,"_self");
 }
 
 const deleteQuestion = (targetElement) => {
   console.log(targetElement)
-  let url = `https://interviewhelp.me/categoryID/${targetElement}`
-  // let url = `http://localhost:3000/categoryID/${targetElement}`
+  let url = `https://interviewhelp.me/Admin/QAdelete/${targetElement}`
+  // let url = `http://localhost:3000/Admin/QAdelete/${targetElement}`
   $.ajax({
     type: 'DELETE',
     url: url,
@@ -110,27 +112,25 @@ $('.tags').on('click', function (event) {
   const tag_val = event.target;
   var css_id = (tag_val.id)
   console.log('= ' + css_id)
-  var split_id = (tag_val.id).split('_')[0]
-  console.log('SPLIT_ID = ' + split_id)
+  var subtag_id = tag_val.id
   const adminID = (window.location.href).split('admin/')[1]
-  const jobRoleid = (tag_val.id).split('_')[1]
-  const subtagName = (tag_val.id).split('_')[2]
+
   // before
   $('.tag').css('background-color', '#e3edf9');
   // after
   $('#' + css_id).css('background-color', '#8aa9c6');
-  let url = `https://interviewhelp.me/${adminID}/subtags/`
-  // let url = `http://localhost:3000/${adminID}/subtags/`
+  let url = `https://interviewhelp.me/Adminsubtag/${adminID}/${subtag_id}`
+  // let url = `http://localhost:3000/Adminsubtag/${adminID}/${subtag_id}`
   console.log(url)
   $.ajax({
-    type: 'POST',
+    type: 'GET',
     url: url,
-    contentType: "application/json",
-    data: JSON.stringify({
-      jobRoleid: jobRoleid,
-      subtagName:subtagName,
-      adminID:adminID
-    }),
+    // contentType: "application/json",
+    // data: JSON.stringify({
+    //   jobRoleid: jobRoleid,
+    //   subtagName:subtagName,
+    //   adminID:adminID
+    // }),
     success: function (output) {
         console.log(output);
       $('.question_section').empty();
@@ -166,36 +166,34 @@ $('.tags').on('click', function (event) {
 
 const update_category = (id_val) => {
   // console.log(id_val)
-  const adminID = (window.location.href).split('adminId/')[1]
-  const adminUserid = adminID.split('/')[0]
+  // const adminID = (window.location.href).split('feature/')[1]
+  // console.log(adminID)
+  const adminID = 'AdminUpdated'
+  // const adminUserid = adminID.split('/')[0]
   var myContent = tinymce.get("myTextarea").getContent();
-  console.log('update = ' + myContent)
-  var category_name = $('#category_name').val()
+  console.log('updated Content = ' + myContent)
+  // var category_name = $('#category_name').val()
   var question = $('#question').val()
-  var tags = $('#tags').val()
-  var Technical_tag = $('#technicalTag').val()
-  var technical_tag_id = $('#technical_tag_id').val()
-  console.log('cat = ' + id_val)
-  // let url = `https://intadmin.herokuapp.com/categoryID/${adminID}/${id_val}`
-  let url = `https://interviewhelp.me/categoryID/${id_val}`
-  // let url = `http://localhost:3000/categoryID/${id_val}`
-
+  console.log('UPDATED QUESTION = ' + question)
+  // var tags = $('#tags').val()
+  // console.log('UPDATED TAGS = ' + tags)
+  // var Technical_tag = $('#technicalTag').val()
+  // var technical_tag_id = $('#technical_tag_id').val()
+  console.log('QuestionValue = ' + id_val)
+  let url = `https://interviewhelp.me/Admin/feature/update/${id_val}`
+    // let url = `http://localhost:3000/Admin/feature/update/${id_val}`
   $.ajax({
     type: 'PUT',
     url: url,
     contentType: "application/json",
     data: JSON.stringify({
-      category_name: category_name,
       question: question,
       answer: myContent,
-      tags: tags,
-      Technical_tag:Technical_tag,
-      technical_tag_id:technical_tag_id
     }),
     success: function (output) {
       console.log(output);
-      window.open(`https://interviewhelp.me/categories/admin/${adminUserid}`, "_self")
-      // window.open(`http://localhost:3000/categories/admin/${adminUserid}`,"_self")
+      window.open(`https://interviewhelp.me/categories/admin/${adminID}`, "_self")
+      // window.open(`http://localhost:3000/categories/admin/${adminID}`,"_self")
     },
     error: function (err) {
       console.log(err)
@@ -209,14 +207,14 @@ $('.question_section').on('click', function (event) {
   const tag_val = event.target;
   console.log(tag_val.id)
   $('#modal-body').empty();
-  let url = `https://interviewhelp.me/categoryID/${tag_val.id}`
-  // let url = `http://localhost:3000/categoryID/${tag_val.id}`
+  let url = `https://interviewhelp.me/AdminQA/${tag_val.id}`
+  // let url = `http://localhost:3000/AdminQA/${tag_val.id}`
   console.log(url)
   $.ajax({
     type: 'GET',
     url: url,
     success: function (output) {
-      console.log('categoryID API SUCCESS' + JSON.stringify(output))
+      console.log(JSON.stringify(output))
      
         $("#modal-body").append(output.answer)
       
@@ -244,21 +242,13 @@ $('.tags_filter').on('click', function (event) {
     // after
   $('#' + subTag_id).css('background-color', '#8aa9c6');
 
-  const technicalTag_id = subTag_id.split("_")[0]
-  const adminID = subTag_id.split("_")[1]
-  const technical_tagName = tag_val.innerHTML
+  const technicalTagid = subTag_id
   // console.log()
-  // let url = `http://localhost:3000/technicalTag`
-  let url = `https://interviewhelp.me/technicalTag`
+  // let url = `http://localhost:3000/Admintechtag/${technicalTagid}`
+  let url = `https://interviewhelp.me/Admintechtag/${technicalTagid}`
   $.ajax({
-    type: 'POST',
+    type: 'GET',
     url: url,
-    contentType: "application/json",
-    data: JSON.stringify({
-      technicalTag_id: technicalTag_id,
-      technical_tagName:technical_tagName,
-      adminID:adminID
-    }),
     success: function (output) {
       if (output) {
         console.log(output)
@@ -270,19 +260,17 @@ $('.tags_filter').on('click', function (event) {
           var tags_str = ""
           const sub_tags = []
           for (var i = 0; i < output.length; i++) {
-            for (var j = 0; j < (output[i].sub_tags).length; j++) {
-              const showSubtags = {
-                tagID : output[i].adminID +'_'+output[i].Jobrole_ID+ '_'+output[i].sub_tags[j] ,
-                techTag: output[i].sub_tags[j]
-              }
-              sub_tags.push(showSubtags)
-          }
+            const showSubtags = {
+              subtagID : (output[i]._id).toString(),
+              subTag: output[i].SubtagName
+            }
+            sub_tags.push(showSubtags)
+          //   for (var j = 0; j < (output[i].sub_tags).length; j++) {
+
+          // }
         }
-        const idsub = sub_tags.map(o => o.tagID)
-        const filteredsub = sub_tags.filter(({tagID}, index) => !idsub.includes(tagID, index + 1))
-        console.log(filteredsub)
-        for (var k = 0; k < filteredsub.length; k++) {
-        tags_str += `<li><a class="tag" id= "${filteredsub[k].tagID}">${filteredsub[k].techTag}</a></li>`
+        for (var k = 0; k < sub_tags.length; k++) {
+        tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
       }
 
 
