@@ -41,7 +41,7 @@
     <div class="container">
       <!-- <%= updateValue %> -->
       <% if(!updateValue){ %>
-      <form action="/create/category" method="post">
+      <form action="/admin/create/" method="post">
         <% }else { %>
         <form>
           <% } %>
@@ -52,7 +52,7 @@
             <select id="category_name" name="category_name" required class="form-select js-example-tags" style="width: 100%;">
               <option selected>Select Job Role</option>
             <%  jobRoles.forEach(function(roles){ %>
-                <option value="<%= roles %>"><%= roles %></option>
+                <option value="<%= roles.role %>"><%= roles.role %></option>
              <% }) %>
             </select>
     
@@ -64,7 +64,7 @@
               <select id="technicalTag" name="technicalTag" required class="form-select js-technical-tags" style="width: 100%;">
                 <option selected>Select Technical Tag</option>
               <%  tech_tags.forEach(function(tag){ %>
-                  <option value="<%= tag %>"><%= tag %></option>
+                  <option value="<%= tag.techtag %>"><%= tag.techtag %></option>
                <% }) %>
               </select>
           </div>
@@ -98,9 +98,12 @@
 
           <div class="mb-3">
             <label class="form-label">Sub-tags</label>
-            <input type="text" value="<%= updateValue.tags == '' ? '' : updateValue.tags  %>" class="form-control"
-              id="tags" name="tags" required>
+            <% if(!updateValue){ %>
+            <input type="text" class="form-control" id="tags" name="tags" required>
             <span style="color: red;">Add tags with (',') sepration. For example:- Android , Ios</span>
+            <% }else { %>
+              <input type="text" value="<%= updateValue.tags  %>" class="form-control" id="tags" name="tags" disabled>
+            <%} %>
           </div>
           <% if(!updateValue){ %>
           <div class="mb-3">
@@ -111,8 +114,8 @@
           <% if(!updateValue){ %>
           <button type="submit" class="btn btn-primary">Create</button>
           <% }else { %>
-          <input type="button" class="btn btn-primary " id="<%=updateValue._id %>"
-            onclick="update_category('<%=updateValue._id %>')" value="Update">
+          <input type="button" class="btn btn-primary " id="<%=updateValue.QAid %>"
+            onclick="update_category('<%=updateValue.QAid %>')" value="Update">
           <% } %>
 
         </form>
