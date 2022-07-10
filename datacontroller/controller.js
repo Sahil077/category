@@ -1056,37 +1056,46 @@ module.exports = function (app) {
         // Read all catetories & HOME PAGE for REGULAR
         app.get('/categories', (req, res) => {
 
-            var instance = new Razorpay({
-                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-            })
-            var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
-            subscriptionDATA.then(meta => {
-                console.log('SUB Data = ' + JSON.stringify(meta));
-                if (meta.status == 'active') {
-                    if (sessions) {
-                        Jobrole.find({}, (err, data) => {
-                            if (err) throw err;
-                            const tech_list = []
-                            for (i = 0; i < data.length; i++) {
-                                tech_list.push({
-                                    role: data[i].category_name,
-                                    role_id: data[i]._id
+            console.log('USER PROFILE DATA = ' + userProfile.emails[0].value)
+            userLogincredential.findOne({
+                useremail: userProfile.emails[0].value
+            }, function (err, Logedindata) {
+                if (err) throw err;
+                if (Logedindata) {
+                    var instance = new Razorpay({
+                        key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                        key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                    })
+                    var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
+                    subscriptionDATA.then(meta => {
+                        console.log('SUB Data = ' + JSON.stringify(meta));
+                        if (meta.status == 'active') {
+                            if (sessions) {
+                                Jobrole.find({}, (err, data) => {
+                                    if (err) throw err;
+                                    const tech_list = []
+                                    console.log(data)
+                                    for (i = 0; i < data.length; i++) {
+                                        tech_list.push({
+                                            role: data[i].category_name,
+                                            role_id: data[i]._id
+                                        })
+                                    }
+                                    res.render('regular', {
+                                        techList: tech_list
+                                    })
                                 })
+                            } else {
+                                res.render('auth')
                             }
-                            res.render('regular', {
-                                techList: tech_list
-                            })
-                        })
-                    } else {
-                        res.render('auth')
-                    }
-                } else {
-                    console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                    res.redirect('/subscriptionPlan')
+                        } else {
+                            console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                            res.redirect('/subscriptionPlan')
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
                 }
-            }).catch(err => {
-                console.log(err)
             })
                 
         })
