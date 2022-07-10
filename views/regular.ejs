@@ -25,9 +25,9 @@
       <p class="job_role">Job Role</p>
       <div class="rolecontent" >
         <select class="custom-select form-control" id="techValue" onchange="techValue()">
-          <option selected>Select category</option>
+          <option selected value="select_Category">Select category</option>
           <%  techList.forEach(function(tech_category){ %>   
-          <option value="<%= tech_category %>"><%= tech_category %></option>
+          <option value="<%= tech_category.role_id %>"><%= tech_category.role %></option>
           <% }) %>
         </select>
         <i class="fa fa-angle-down arror"></i>
