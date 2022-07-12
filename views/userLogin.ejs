@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bootstrap demo</title>
+  <title>InterviewHelp</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
   <link rel="stylesheet" href="/css/styles.css">
@@ -19,12 +19,12 @@
 
   .login-container {
     position: relative;
+    bottom: 72px;
   }
 
   .center {
     margin: 0;
     position: absolute;
-    top: 50%;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -33,10 +33,17 @@
     border-radius: 30px;
   }
   .answer-container{
-    margin-top: 54px;
-    margin-left: 20px;
+
+    margin-bottom: 40px;
     font-weight: bold;
     text-decoration: underline;
+    text-align: center;
+  }
+
+  .reviews-container p {
+    text-align: center;
+    font-weight: 700;
+    font-size: x-large;
   }
   body {
   overflow-x: hidden; /* Hide horizontal scrollbar */
@@ -47,21 +54,12 @@
 
   <div>
     <div class="row">
-      <div class="col-lg-3 col-md-3 col-sm-6">
-        <img src="../img/3969587.jpg" alt="about" width="100%" height="100%">
+      <div class="col-sm-5 col-md-6">
+        <img style="padding: 24px;" src="../img/istockphoto-977762310-170667a.jpg" alt="about" width="100%" height="80%">
       </div>
-      <div class="col-lg-9 col-md-9 col-sm-6 query_section">
-        <div class="row">
-          <p>What are the differences between Continuous Integration, Continuous Delivery, and Continuous Deployment?
-          </p>
-        </div>
-        <div class="row mb-2">
-          <p>How to setup jenkins to execute a schedule job/pipeline & how it is triggered?</p>
-        </div>
-        <div class="row mb-2">
-          <p>Don't worry InterviewHelp Platform will assist you in preparing best for interviews & getting a job
-            opportunity.</p>
-        </div>
+      <div class="col-sm-5 col-md-3">
+        <p style="position: absolute;top: 200px;font-weight: bold;">Don't worry InterviewHelp Platform will assist you in preparing best for interviews & getting a job
+          opportunity.</p>
       </div>
     </div>
   </div>
@@ -76,21 +74,25 @@
     <p>Answers are fine tuned for you, so that interviewer <br> gets impressed.</p>
   </div>
 
+  <div class="reviews-container">
+    <p>Reviews:- </p>
+  </div>
+
   <div class="feedback-queries">
     <div class="row">
       <div class="col-lg-4 mt-4">
-        <img src="../img/feedback_1.jpeg" alt="about" width="100%" height="50%">
+        <img src="../img/feedback_1.jpeg" alt="about" width="90%" height="50%">
       </div>
       <div class="col-lg-4">
-        <img src="../img/3969587.jpg" alt="about" width="80%" height="80%">
+        <img src="../img/3969587.jpg" alt="about" width="100%" height="80%">
       </div>
       <div class="col-lg-4">
-        <img src="../img/feedback_2.jpeg" alt="about" width="80%" height="80%">
+        <img src="../img/feedback_2.jpeg" alt="about" width="100%" height="80%">
       </div>
     </div>
   </div>
 
-  <div class="login-container mb-4">
+  <div class="login-container mb-4 mt-4">
     <div class="center">
       <a href="/auth/google" class="btn btn-danger btn-login"><span class="fa fa-google"></span> SignIn with Google</a>
     </div>
