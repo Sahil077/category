@@ -394,7 +394,6 @@ module.exports = function (app) {
                             useremail: userProfile.emails[0].value
                         }, function (err, data) {
                             if (err) throw err;
-                            console.log('OLD USER WITH SUBSCRIPTIOIN')
                             // SUBSCRIPTION RAZORPAY CREDENTIALS
                             var instance = new Razorpay({
                                 key_id: 'rzp_live_5V9Rr2HtEbDI2n',
@@ -406,6 +405,7 @@ module.exports = function (app) {
                                 // console.log('SUB Data = ' + JSON.stringify(meta));
                                 if (meta.status == 'active') {
                                     sessions = req.session
+                                     console.log('OLD USER WITH SUBSCRIPTIOIN')
                                     res.redirect('/categories')
                                 } else {
                                     console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
