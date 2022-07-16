@@ -4,12 +4,12 @@ const techValue = () => {
   // let url = `https://intadmin.herokuapp.com/categoryName/${category_value}`
   let url = `https://interviewhelp.me/AdminJobrole/${adminID}/${role_id}`
   // let url = `http://localhost:3000/AdminJobrole/${adminID}/${role_id}`
-console.log('JOB ROLE ID = ' + role_id)
+// console.log('JOB ROLE ID = ' + role_id)
   $.ajax({
     type: 'GET',
     url: url,
     success: function (output) {
-      console.log(output);
+      // console.log(output);
       if (output.length > 0) {
         $('.question_section').empty();
         $('.tags').empty();
@@ -21,7 +21,7 @@ console.log('JOB ROLE ID = ' + role_id)
         const sub_tags = []
         for (var i = 0; i < output.length; i++) {
           // var categoryId = (output[i]._id).toString()
-          console.log(output[i])
+          // console.log(output[i])
           const showTechtags = {
             tagID : (output[i]._id).toString(),
             techTag: output[i].techTagname
@@ -38,15 +38,25 @@ console.log('JOB ROLE ID = ' + role_id)
       // const idsub = sub_tags.map(o => o.tagID)
       // const filteredsub = sub_tags.filter(({tagID}, index) => !idsub.includes(tagID, index + 1))
       // console.log(filteredsub)
-      for (var k = 0; k < sub_tags.length; k++) {
-      tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
+      var sortedSubtag = sub_tags.sort(function(a, b) {
+        var textA = a.subTag.toUpperCase();
+        var textB = b.subTag.toUpperCase();
+        return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+      });
+      for (var k = 0; k < sortedSubtag.length; k++) {
+      tags_str += `<li><a class="tag" id= "${sortedSubtag[k].subtagID}">${sortedSubtag[k].subTag}</a></li>`
     }
       // 
         // const ids = technical_tags.map(o => o.tagID)
         // const filtered = technical_tags.filter(({tagID}, index) => !ids.includes(tagID, index + 1))
         // console.log(filtered)
-        for (var j = 0; j < technical_tags.length; j++) {
-          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}" >${technical_tags[j].techTag}</a></li>`
+        var sortedtechnicaltag = technical_tags.sort(function(a, b) {
+          var textA = a.techTag.toUpperCase();
+          var textB = b.techTag.toUpperCase();
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        });
+        for (var j = 0; j < sortedtechnicaltag.length; j++) {
+          tech_tags += `<li><a class="single_tag" id="${sortedtechnicaltag[j].tagID}" >${sortedtechnicaltag[j].techTag}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -269,8 +279,13 @@ $('.tags_filter').on('click', function (event) {
 
           // }
         }
-        for (var k = 0; k < sub_tags.length; k++) {
-        tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
+        var sortedSubtag = sub_tags.sort(function(a, b) {
+          var textA = a.subTag.toUpperCase();
+          var textB = b.subTag.toUpperCase();
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        });
+        for (var k = 0; k < sortedSubtag.length; k++) {
+        tags_str += `<li><a class="tag" id= "${sortedSubtag[k].subtagID}">${sortedSubtag[k].subTag}</a></li>`
       }
 
 
