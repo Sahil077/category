@@ -33,11 +33,21 @@ const techValue = () => {
             sub_tags.push(showSubtags)
           }
         }
-        for (var k = 0; k < sub_tags.length; k++) {
-          tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
+        var sortedSubtag = sub_tags.sort(function(a, b) {
+          var textA = a.subTag.toUpperCase();
+          var textB = b.subTag.toUpperCase();
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        });
+        for (var k = 0; k < sortedSubtag.length; k++) {
+          tags_str += `<li><a class="tag" id= "${sortedSubtag[k].subtagID}">${sortedSubtag[k].subTag}</a></li>`
         }
-        for (var j = 0; j < technical_tags.length; j++) {
-          tech_tags += `<li><a class="single_tag" id="${technical_tags[j].tagID}" >${technical_tags[j].techTag}</a></li>`
+        var sortedtechnicaltag = technical_tags.sort(function(a, b) {
+          var textA = a.techTag.toUpperCase();
+          var textB = b.techTag.toUpperCase();
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        });
+        for (var j = 0; j < sortedtechnicaltag.length; j++) {
+          tech_tags += `<li><a class="single_tag" id="${sortedtechnicaltag[j].tagID}" >${sortedtechnicaltag[j].techTag}</a></li>`
         }
         $('.question_section').append(str)
         $('.tags').append(tags_str)
@@ -157,8 +167,13 @@ $('.tags_filter').on('click', function (event) {
           }
           sub_tags.push(showSubtags)
         }
-        for (var k = 0; k < sub_tags.length; k++) {
-          tags_str += `<li><a class="tag" id= "${sub_tags[k].subtagID}">${sub_tags[k].subTag}</a></li>`
+        var sortedSubtag = sub_tags.sort(function(a, b) {
+          var textA = a.subTag.toUpperCase();
+          var textB = b.subTag.toUpperCase();
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+        });
+        for (var k = 0; k < sortedSubtag.length; k++) {
+          tags_str += `<li><a class="tag" id= "${sortedSubtag[k].subtagID}">${sortedSubtag[k].subTag}</a></li>`
         }
         $('.tags').append(tags_str)
         $('.select_Category').hide()
