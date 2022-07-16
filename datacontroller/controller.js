@@ -60,7 +60,6 @@ const userSchema = new mongoose.Schema({
     username: String,
     useremail: String,
     created_at: Date,
-    payment: false,
     subscriptions_id: '',
     plan_id: ''
 })
@@ -385,38 +384,43 @@ module.exports = function (app) {
         app.get('/success', (req, res) => {
 
             if (req.session && userProfile.emails[0].verified == true) {
-                console.log('G DETAIL = ' + userProfile)
-                userLogincredential.findOne({
+             
+                userLogincredential.count({
                     useremail: userProfile.emails[0].value
-                }, function (err, data) {
+                }, (err, Rolecounter) => {
                     if (err) throw err;
-                    if (data) {
-                        console.log('OLD USER WITH SUBSCRIPTIOIN')
-                        // SUBSCRIPTION RAZORPAY CREDENTIALS
-                        var instance = new Razorpay({
-                            key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                            key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                    if (Rolecounter > 0) {
+                        userLogincredential.findOne({
+                            useremail: userProfile.emails[0].value
+                        }, function (err, data) {
+                            if (err) throw err;
+                            console.log('OLD USER WITH SUBSCRIPTIOIN')
+                            // SUBSCRIPTION RAZORPAY CREDENTIALS
+                            var instance = new Razorpay({
+                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                            })
+
+                            var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
+                            subscriptionDATA.then(meta => {
+                                // console.log('SUB Data = ' + JSON.stringify(meta));
+                                if (meta.status == 'active') {
+                                    sessions = req.session
+                                    res.redirect('/categories')
+                                } else {
+                                    console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                                    res.redirect('/subscriptionPlan')
+                                }
+                            }).catch(err => {
+                                console.log(err)
+                            })
                         })
-                        var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
-                        subscriptionDATA.then(meta => {
-                            console.log('SUB Data = ' + JSON.stringify(meta));
-                            if (meta.status == 'active') {
-                                sessions = req.session
-                                res.redirect('/categories')
-                            } else {
-                                console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                                res.redirect('/subscriptionPlan')
-                            }
-                        }).catch(err => {
-                            console.log(err)
-                        })
-                    } else {
+                    }else{
                         console.log('NEW USER')
                         new userLogincredential({
                             username: userProfile.displayName,
                             useremail: userProfile.emails[0].value,
                             created_at: new Date(),
-                            payment: false,
                             subscriptions_id: '',
                             plan_id: ''
                         }).save(function (err, data) {
@@ -427,7 +431,7 @@ module.exports = function (app) {
                             }
                         });
                     }
-                })
+                })     
             } else {
                 res.send("error logging in")
             }
@@ -941,7 +945,7 @@ module.exports = function (app) {
         // SUBSCRIPTION PLAN....................
 
         app.get('/subscriptionPlan', (req, res) => {
-            console.log('G DETAIL SUBPLAN = ' + userProfile)
+            // console.log('G DETAIL SUBPLAN = ' + JSON.stringify(userProfile))
             res.render('subscriptionPlan')
         })
 
@@ -977,15 +981,15 @@ module.exports = function (app) {
                 key_id: 'rzp_live_5V9Rr2HtEbDI2n',
                 key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
             })
-            console.log('PLAN ID =' + req.body.id)
+            // console.log('PLAN ID =' + req.body.id)
             var plan_id = req.body.id
-            let experiy_date = Math.floor(new Date('2022.09.01').getTime() / 1000)
+            // let experiy_date = Math.floor(new Date('2022.09.01').getTime() / 1000)
             instance.subscriptions.create({
                 plan_id: req.body.id,
                 customer_notify: 1,
                 total_count: 6,
-                expire_by: experiy_date,
-                addons: [{
+                // expire_by: experiy_date,
+                addons: [{ 
                     item: {
                         name: "Delivery charges",
                         amount: 100,
@@ -1006,66 +1010,36 @@ module.exports = function (app) {
                     }, function (err, data) {
                         if (err) throw err;
                         sessions = req.session
+                        responce['email'] = userProfile.emails[0].value
+                        console.log(responce)
                         res.json(responce)
                     })
-
-                    // console.log('SUB = ' + responce)
-                    // res.json(responce)
                 }
             })
         })
 
-        // app.post('/verifypayment', (req, res) => {
-        //     const razorpay_payment_id = req.body.payment_id
-        //     const razorpay_signature = req.body.signature
-
-        //     userLogincredential.findOne({
-        //         useremail: userProfile.emails[0].value
-        //     }, function (err, data) {
-        //         if (err) throw err;
-        //         console.log('PAYEMNT = ' + data.subscriptions_id)
-        //         const subscription_id = data.subscriptions_id
-        //         var secret = "e9jv1rohg1D2bWB0DAio3amJ"
-        //         // generated_signature = hmac_sha256(razorpay_payment_id + "|" + subscription_id, secret);
-        //         let hmac = crypto.createHmac('sha256', secret);
-        //         hmac.update(subscription_id + "|" + razorpay_payment_id);
-        //         const generated_signature = hmac.digest('hex');
-        //         console.log(generated_signature)
-        //         console.log(razorpay_signature)
-        //         if (generated_signature == razorpay_signature) {
-        //             res.json({
-        //                 success: true
-        //             })
-        //         } else {
-        //             res.json({
-        //                 success: false
-        //             })
-        //         }
-        //     })
-        // })
-
-
-
         // TESTING FRONTEND API
         app.get('/test', (req, res) => {
-            res.render('dummy')
+            res.render('subscriptionPlan')
         })
 
         // new USEER API'S...................
 
         // Read all catetories & HOME PAGE for REGULAR
         app.get('/categories', (req, res) => {
-
-            console.log('USER PROFILE DATA = ' + userProfile.emails[0].value)
-            userLogincredential.findOne({
+            userLogincredential.count({
                 useremail: userProfile.emails[0].value
-            }, function (err, Logedindata) {
+            }, (err, Rolecounter) => {
                 if (err) throw err;
-                if (Logedindata) {
+                if (Rolecounter > 0) {
+                    userLogincredential.findOne({
+                        useremail: userProfile.emails[0].value
+                    }, function (err, Logedindata) {
+                        if (err) throw err;
                     var instance = new Razorpay({
                         key_id: 'rzp_live_5V9Rr2HtEbDI2n',
                         key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                    })
+                    }) 
                     var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
                     subscriptionDATA.then(meta => {
                         console.log('SUB Data = ' + JSON.stringify(meta));
@@ -1074,7 +1048,6 @@ module.exports = function (app) {
                                 Jobrole.find({}, (err, data) => {
                                     if (err) throw err;
                                     const tech_list = []
-                                    console.log(data)
                                     for (i = 0; i < data.length; i++) {
                                         tech_list.push({
                                             role: data[i].category_name,
@@ -1095,9 +1068,12 @@ module.exports = function (app) {
                     }).catch(err => {
                         console.log(err)
                     })
-                }
-            })
-                
+
+                })
+            }else{
+                res.render('auth')
+            }
+            })            
         })
 
         app.get('/jobrole/:jobRoleid', (req, res) => {
