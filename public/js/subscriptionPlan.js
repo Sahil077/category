@@ -1,5 +1,7 @@
 function createPlan(){
 // document.getElementById('pay').onclick = function (e) {
+    $('#create_plan_sub').hide()
+    $('#loading_plan').show()
     const period = 'daily'
     const interval = 7
     const amount = 100 // 100paise = 1rs
@@ -60,9 +62,13 @@ function verifyPayment(orderDetails) {
             console.log(response)
             // razorPayverify(response)
             if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
+                $('#create_plan_sub').show()
+                $('#loading_plan').hide()
                 window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
                 // window.open(`http://localhost:3000/subscriptionPlan`, "_self")
               } else {
+                $('#create_plan_sub').show()
+                $('#loading_plan').hide()
                 window.open(`https://interviewhelp.me/categories`, "_self")
                 // window.open(`http://localhost:3000/categories`, "_self")
               }
