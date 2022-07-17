@@ -395,14 +395,11 @@ module.exports = function (app) {
                         }, function (err, data) {
                             if (err) throw err;
                             // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            // var instance = new Razorpay({
-                            //     key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                            //     key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            // })
                             var instance = new Razorpay({
-                                key_id: 'rzp_test_SQS56XrzM6nFIo',
-                                key_secret: 'vk6qMo4dIp37CRvd0lAflmKu'
-                            })
+                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                            }) 
+                            
                             
 
                             var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
@@ -957,14 +954,10 @@ module.exports = function (app) {
         // CREATE PLAN FOR SUBSCRIPTION
         app.post('/plans', (req, res) => {
                             // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            // var instance = new Razorpay({
-                            //     key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                            //     key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            // })
                             var instance = new Razorpay({
-                                key_id: 'rzp_test_SQS56XrzM6nFIo',
-                                key_secret: 'vk6qMo4dIp37CRvd0lAflmKu'
-                            })
+                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                            }) 
 
             instance.plans.create({
                 period: "daily",
@@ -986,14 +979,10 @@ module.exports = function (app) {
         // CREATE SUBSCRIPTION
         app.post('/subscriptions', (req, res) => {
                             // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            // var instance = new Razorpay({
-                            //     key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                            //     key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            // })
                             var instance = new Razorpay({
-                                key_id: 'rzp_test_SQS56XrzM6nFIo',
-                                key_secret: 'vk6qMo4dIp37CRvd0lAflmKu'
-                            })
+                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                            }) 
             // console.log('PLAN ID =' + req.body.id)
             var plan_id = req.body.id
             // let experiy_date = Math.floor(new Date('2022.09.01').getTime() / 1000)
@@ -1050,14 +1039,10 @@ module.exports = function (app) {
                     }, function (err, Logedindata) {
                         if (err) throw err;
                             // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            // var instance = new Razorpay({
-                            //     key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                            //     key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            // })
                             var instance = new Razorpay({
-                                key_id: 'rzp_test_SQS56XrzM6nFIo',
-                                key_secret: 'vk6qMo4dIp37CRvd0lAflmKu'
-                            })
+                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                            }) 
                     var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
                     subscriptionDATA.then(meta => {
                         console.log('SUB Data = ' + JSON.stringify(meta));
