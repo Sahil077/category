@@ -60,22 +60,25 @@ function verifyPayment(orderDetails) {
         "description": "Monthly Test Plan", 
         "handler": function(response) { 
             // console.log(response)
+            $('#create_plan_sub').show()
+             $('#loading_plan').hide()
+            window.open(`https://interviewhelp.me/categories`, "_self")
             // razorPayverify(response)
-            if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
-                console.log(response.razorpay_payment_id)
-                $('#create_plan_sub').show()
-                $('#loading_plan').hide()
-                window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
-                // window.open(`http://localhost:3000/subscriptionPlan`, "_self")
-              } else {
-                  console.log(response.razorpay_payment_id)
-                  $('#create_plan_sub').show()
-                  $('#loading_plan').hide()
-                window.open(`https://interviewhelp.me/categories`, "_self")
+//             if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
+//                 console.log(response.razorpay_payment_id)
+//                 $('#create_plan_sub').show()
+//                 $('#loading_plan').hide()
+//                 window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
+//                 // window.open(`http://localhost:3000/subscriptionPlan`, "_self")
+//               } else {
+//                   console.log(response.razorpay_payment_id)
+//                   $('#create_plan_sub').show()
+//                   $('#loading_plan').hide()
+//                 window.open(`https://interviewhelp.me/categories`, "_self")
 
-                // window.open(`http://localhost:3000/categories`, "_self")
+//                 // window.open(`http://localhost:3000/categories`, "_self")
                 
-              }
+//               }
         },prefill: {
             email: orderDetails.email,
             // contact: "9999999999",
