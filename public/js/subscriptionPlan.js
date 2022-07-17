@@ -54,25 +54,27 @@ function verifyPayment(orderDetails) {
     // KEY FOR SUBSCRIPTION PLAN CREDENTIALS
     var options = { 
         "key": "rzp_live_5V9Rr2HtEbDI2n",
-      //  "key": "rzp_test_SQS56XrzM6nFIo",
+        // "key": "rzp_test_SQS56XrzM6nFIo",
         "subscription_id": orderDetails.id, 
         "name": "InterviewHelp", 
         "description": "Monthly Test Plan", 
         "handler": function(response) { 
-     
+            // console.log(response)
             // razorPayverify(response)
             if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
+                console.log(response.razorpay_payment_id)
                 $('#create_plan_sub').show()
                 $('#loading_plan').hide()
-                console.log(response.razorpay_payment_id)
                 window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
                 // window.open(`http://localhost:3000/subscriptionPlan`, "_self")
               } else {
-                $('#create_plan_sub').show()
-                $('#loading_plan').hide()
-console.log(response.razorpay_payment_id)
+                  console.log(response.razorpay_payment_id)
+                  $('#create_plan_sub').show()
+                  $('#loading_plan').hide()
                 window.open(`https://interviewhelp.me/categories`, "_self")
+
                 // window.open(`http://localhost:3000/categories`, "_self")
+                
               }
         },prefill: {
             email: orderDetails.email,
