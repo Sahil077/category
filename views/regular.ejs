@@ -9,12 +9,15 @@
     <link rel="stylesheet" href="/css/v2_styles.css">
     <script src="https://kit.fontawesome.com/9171275aa1.js" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+
   </head>
   <body>
 
     <!-- navbar -->
     <nav class="navbar navbar-light bg-light justify-content-between">
-      <a class="navbar-brand">Intadmin</a>
+      <a class="navbar-brand">Interview Help</a>
       <form class="form-inline" action="/logout">
         <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
       </form>
@@ -22,8 +25,8 @@
 
       <!-- Drop Down Section -->
     <section id="tech_role_selection">
-      <p class="job_role">Job Role</p>
-      <div class="rolecontent" >
+      <!-- <div class="rolecontent" >
+        <p class="job_role">Job Role</p>
         <select class="custom-select form-control" id="techValue" onchange="techValue()">
           <option selected value="select_Category">Select category</option>
           <%  techList.forEach(function(tech_category){ %>   
@@ -31,7 +34,21 @@
           <% }) %>
         </select>
         <i class="fa fa-angle-down arror"></i>
-      </div>
+      </div> -->
+      
+      <ul class="nav nav-tabs price_tab mt_70">
+        <li class="nav-item">
+            <a class="nav-link_1" role="tab" >Job Role</a>
+        </li>
+        <li class="nav-item">
+          <select class=" custom-select form-control" id="techValue" onchange="techValue()">
+            <option selected value="select_Category">Select category</option>
+            <%  techList.forEach(function(tech_category){ %>   
+            <option value="<%= tech_category.role_id %>"><%= tech_category.role %></option>
+            <% }) %>
+          </select>
+        </li>
+    </ul>
       <div class="tag_filter">
         <ul class="tags_filter">
            
@@ -42,7 +59,7 @@
     <!-- Question & tags sections -->
     <section id="question_tags_selection">
         <!-- <div class="container"> -->
-            <div class="row" style="margin-bottom: 40px;">
+            <div class="row" style="margin-bottom: 273px;">
               <div class="col tags_div" style="margin-right: 10px !important">
                 <div class="card" >
                     <p class="select_Category" style="text-align: center!important;">Tags</p>
@@ -116,5 +133,6 @@
 
     <script src="/js/regular.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+ 
   </body>
 </html>
