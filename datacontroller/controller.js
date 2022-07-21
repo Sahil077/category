@@ -60,8 +60,11 @@ const userSchema = new mongoose.Schema({
     username: String,
     useremail: String,
     created_at: Date,
-    subscriptions_id: '',
-    plan_id: ''
+    subscriptions_id: String,
+    plan_id: String,
+    status: String,
+    expireDate: String,
+    password:String
 })
 
 const userLogincredential = mongoose.model("userLogincredential", userSchema);
@@ -394,28 +397,30 @@ module.exports = function (app) {
                             useremail: userProfile.emails[0].value
                         }, function (err, data) {
                             if (err) throw err;
+                             if(data.subscriptions_id){
                             // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            var instance = new Razorpay({
-                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            }) 
-                            
-                            
-
-                            var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
-                            subscriptionDATA.then(meta => {
-                                // console.log('SUB Data = ' + JSON.stringify(meta));
-                                if (meta.status == 'active') {
-                                    sessions = req.session
-                                     console.log('OLD USER WITH SUBSCRIPTIOIN')
-                                    res.redirect('/categories')
-                                } else {
-                                    console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                                    res.redirect('/subscriptionPlan')
-                                }
-                            }).catch(err => {
-                                console.log(err)
-                            })
+                                var instance = new Razorpay({
+                                    key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                    key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                                })
+                                var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
+                                subscriptionDATA.then(meta => {
+                                    // console.log('SUB Data = ' + JSON.stringify(meta));
+                                    if (meta.status == 'active') {
+                                        sessions = req.session
+                                         console.log('OLD USER WITH SUBSCRIPTIOIN')
+                                        res.redirect('/categories')
+                                    } else {
+                                        console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                                        res.redirect('/subscriptionPlan')
+                                    }
+                                }).catch(err => {
+                                    console.log(err)
+                                })
+                            }else{
+                                console.log('OLD USER WITH NULL SUBSCRIPTIOIN DETAILS')
+                                res.redirect('/subscriptionPlan')  
+                            }
                         })
                     }else{
                         console.log('NEW USER')
@@ -455,6 +460,7 @@ module.exports = function (app) {
                 } else {
                     // data["Data"] = 'Session destroy successfully';
                     sessions = ''
+                    userProfile = ''
                     // res.json(data);
                     res.redirect("/");
                 }
@@ -978,11 +984,11 @@ module.exports = function (app) {
 
         // CREATE SUBSCRIPTION
         app.post('/subscriptions', (req, res) => {
-                            // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            var instance = new Razorpay({
-                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            }) 
+            // SUBSCRIPTION PLAN CREDENTIALS
+             var instance = new Razorpay({
+                 key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                 key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+             })
             // console.log('PLAN ID =' + req.body.id)
             var plan_id = req.body.id
             // let experiy_date = Math.floor(new Date('2022.09.01').getTime() / 1000)
@@ -1001,9 +1007,15 @@ module.exports = function (app) {
             }, (err, responce) => {
                 if (err) {
                     console.log(err)
-                } else {
+                } else { 
+                    var userEmail;
+                    if(userProfile.emails[0].value){
+                        userEmail =  userProfile.emails[0].value
+                    }else{
+                        userEmail = userProfile
+                    }
                     userLogincredential.update({
-                        'useremail': userProfile.emails[0].value
+                        'useremail': userEmail
                     }, {
                         $set: {
                             'plan_id': plan_id,
@@ -1012,7 +1024,7 @@ module.exports = function (app) {
                     }, function (err, data) {
                         if (err) throw err;
                         sessions = req.session
-                        responce['email'] = userProfile.emails[0].value
+                        responce['email'] = userEmail
                         console.log(responce)
                         res.json(responce)
                     })
@@ -1020,12 +1032,91 @@ module.exports = function (app) {
             })
         })
 
-        // TESTING FRONTEND API
-        app.get('/test', (req, res) => {
-            res.render('subscriptionPlan')
+        // new USEER API'S...................
+    
+            // NORMAL USER SIGN-IN
+        app.get('/login-user', (req, res) => {
+            res.render('normalSignIn')
         })
 
-        // new USEER API'S...................
+        app.get('/register-user', (req, res) => {
+            res.render('normaluserRegister')
+        })
+
+        app.post('/login-user', (req, res) => {
+            var key = "123|a123123123123123@&";
+            var cipher = crypto.createCipher('aes-256-cbc', key);
+            var crypted = cipher.update(req.body.password, 'utf-8', 'hex');
+            crypted += cipher.final('hex');
+            console.log(crypted)
+            userLogincredential.findOne({
+                useremail: req.body.email,
+            }, function (err, Logedindata) {
+                if (err) throw err;
+                if(crypted == Logedindata.password){
+                    userProfile = {
+                        emails:[{value:req.body.email}]
+                    }
+                    console.log('------ ' + userProfile)
+                    if(Logedindata.subscriptions_id){
+                        // SUBSCRIPTION RAZORPAY CREDENTIALS
+                        var instance = new Razorpay({
+                            key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                            key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                            })
+                            // var instance = new Razorpay({
+                            //     key_id: 'rzp_test_SQS56XrzM6nFIo',
+                            //     key_secret: 'vk6qMo4dIp37CRvd0lAflmKu'
+                            // })
+
+                            var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
+                            subscriptionDATA.then(meta => {
+                                // console.log('SUB Data = ' + JSON.stringify(meta));
+                                if (meta.status == 'active') {
+                                    sessions = 'data'
+                                    console.log('OLD USER WITH SUBSCRIPTIOIN')
+                                    res.redirect('/categories')
+                                } else {
+                                    console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                                    res.redirect('/subscriptionPlan')
+                                }
+                            }).catch(err => {
+                                console.log(err)
+                            })
+                        }else{
+                            console.log('OLD USER WITH NULL SUBSCRIPTIOIN DETAILS')
+                            res.redirect('/subscriptionPlan')  
+                        }
+                }else{
+                    res.send('worng details entered')
+                }
+            })
+        })
+      
+        app.post('/register-user',(req,res) =>{
+            console.log(req.body)
+            const pass = req.body.password
+            var key = "123|a123123123123123@&";
+            var cipher = crypto.createCipher('aes-256-cbc', key);
+            var crypted = cipher.update(pass, 'utf-8', 'hex');
+            crypted += cipher.final('hex');
+            console.log(crypted)
+
+            new userLogincredential({
+                username: req.body.name,
+                useremail: req.body.email,
+                password:crypted,
+                created_at: new Date(),
+                subscriptions_id: '',
+                plan_id: ''
+            }).save(function (err, data) {
+                if (err) {
+                    res.sendStatus(400);
+                } else {
+                    res.redirect('/login-user')
+                }
+        })
+    })
 
         // Read all catetories & HOME PAGE for REGULAR
         app.get('/categories', (req, res) => {
