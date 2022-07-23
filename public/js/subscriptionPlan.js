@@ -62,23 +62,22 @@ function verifyPayment(orderDetails) {
             // console.log(response)
             $('#create_plan_sub').show()
              $('#loading_plan').hide()
-            window.open(`https://interviewhelp.me/categories`, "_self")
-            // razorPayverify(response)
-//             if (typeof response.razorpay_payment_id == 'undefined' ||  response.razorpay_payment_id < 1) {
-//                 console.log(response.razorpay_payment_id)
-//                 $('#create_plan_sub').show()
-//                 $('#loading_plan').hide()
-//                 window.open(`https://interviewhelp.me/subscriptionPlan`, "_self")
-//                 // window.open(`http://localhost:3000/subscriptionPlan`, "_self")
-//               } else {
-//                   console.log(response.razorpay_payment_id)
-//                   $('#create_plan_sub').show()
-//                   $('#loading_plan').hide()
-//                 window.open(`https://interviewhelp.me/categories`, "_self")
-
-//                 // window.open(`http://localhost:3000/categories`, "_self")
-                
-//               }
+               let url = 'https://interviewhelp.me/subscription-status_exp'
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        subId: orderDetails.id,
+                    }),
+                    success: function (output) {
+                        console.log(output)
+                        window.open(`https://interviewhelp.me/categories`, "_self")
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
         },prefill: {
             email: orderDetails.email,
             // contact: "9999999999",
