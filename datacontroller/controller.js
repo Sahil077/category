@@ -397,26 +397,73 @@ module.exports = function (app) {
                             useremail: userProfile.emails[0].value
                         }, function (err, data) {
                             if (err) throw err;
-                             if(data.subscriptions_id){
-                            // SUBSCRIPTION RAZORPAY CREDENTIALS
-                                var instance = new Razorpay({
-                                    key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                                    key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                                })
+                            if(data.subscriptions_id){
+                                const today = new Date();
+                                const yyyy = today.getFullYear();
+                                let mm = today.getMonth() + 1; // Months start at 0!
+                                let dd = today.getDate();
+                                if (dd < 10) dd = '0' + dd;
+                                if (mm < 10) mm = '0' + mm;
+                                const formattedToday =  mm + '/' + dd + '/' + yyyy;
+                                var expirydate = Date.parse(data.expireDate);
+                                var todaydate = Date.parse(formattedToday.toString());
+                                if (expirydate >= todaydate) {
+                                    if(data.status == 'active'){
+                                        sessions = req.session
+                                        console.log('OLD USER WITH SUBSCRIPTIOIN')
+                                        res.redirect('/categories')
+                                    }else{
+                                        console.log('OLD USER WITH EXPIRED/UNACTIVE SUBSCRIPTIOIN')
+                                        res.redirect('/subscriptionPlan')
+                                    }
+                                 }else{
+                                // SUBSCRIPTION RAZORPAY CREDENTIALS
+                                 var instance = new Razorpay({
+                                     key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                                     key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                                 })
                                 var subscriptionDATA = instance.subscriptions.fetch(data.subscriptions_id)
                                 subscriptionDATA.then(meta => {
                                     // console.log('SUB Data = ' + JSON.stringify(meta));
                                     if (meta.status == 'active') {
                                         sessions = req.session
-                                         console.log('OLD USER WITH SUBSCRIPTIOIN')
-                                        res.redirect('/categories')
+                                        console.log('OLD USER WITH and expired date SUBSCRIPTIOIN')
+                                        const d = new Date();
+                                        let month = d.getMonth();
+                                        let year = d.getFullYear();
+                                        let day = d.getDate();
+                                        var finaldate = new Date(year, month, day);
+                                        let incresedDate = finaldate.setMonth(finaldate.getMonth() + 0);
+                                        let expirydate = new Date(incresedDate).toLocaleDateString("en-US")
+                                        userLogincredential.update({
+                                            'useremail': userProfile.emails[0].value
+                                        }, {
+                                            $set: {
+                                                'status': 'active',
+                                                'expireDate': expirydate
+                                            }
+                                        }, function (err, data) {
+                                            if (err) throw err;
+                                            res.redirect('/categories')
+                                        })
                                     } else {
                                         console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                                        res.redirect('/subscriptionPlan')
+                                        userLogincredential.update({
+                                            'useremail': userProfile.emails[0].value
+                                        }, {
+                                            $set: {
+                                                'status': 'non-active',
+                                            }
+                                        }, function (err, data) {
+                                            if (err) throw err;
+                                            res.redirect('/subscriptionPlan')
+                                        })
                                     }
                                 }).catch(err => {
                                     console.log(err)
                                 })
+
+                                 }
                             }else{
                                 console.log('OLD USER WITH NULL SUBSCRIPTIOIN DETAILS')
                                 res.redirect('/subscriptionPlan')  
@@ -429,7 +476,9 @@ module.exports = function (app) {
                             useremail: userProfile.emails[0].value,
                             created_at: new Date(),
                             subscriptions_id: '',
-                            plan_id: ''
+                            plan_id: '',
+                            status: '',
+                            expireDate: ''
                         }).save(function (err, data) {
                             if (err) {
                                 res.sendStatus(400);
@@ -959,21 +1008,20 @@ module.exports = function (app) {
 
         // CREATE PLAN FOR SUBSCRIPTION
         app.post('/plans', (req, res) => {
-                            // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            var instance = new Razorpay({
-                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            }) 
-
+            // SUBSCRIPTION PLAN CREDENTIALS
+            var instance = new Razorpay({
+                 key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                 key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+             })
             instance.plans.create({
-                period: "daily",
-                interval: 7,
+                period: "monthly", //monthly
+                interval: 1,
                 item: {
-                    name: "Test plan - daily",
-                    amount: 100,
+                    name: "Monthly plan - daily",
+                    amount: 284850,
                     currency: "INR"
                 }
-            }, (err, responce) => {
+            }, (err, responce) => { 
                 if (err) {
                     console.log(err)
                 } else {
@@ -982,25 +1030,26 @@ module.exports = function (app) {
             })
         })
 
+
         // CREATE SUBSCRIPTION
         app.post('/subscriptions', (req, res) => {
             // SUBSCRIPTION PLAN CREDENTIALS
-             var instance = new Razorpay({
-                 key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+            var instance = new Razorpay({
+                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
                  key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-             })
-            // console.log('PLAN ID =' + req.body.id)
+            })
+
             var plan_id = req.body.id
             // let experiy_date = Math.floor(new Date('2022.09.01').getTime() / 1000)
             instance.subscriptions.create({
                 plan_id: req.body.id,
                 customer_notify: 1,
+                quantity: 1,
                 total_count: 6,
-                // expire_by: experiy_date,
                 addons: [{ 
                     item: {
-                        name: "Delivery charges",
-                        amount: 100,
+                        name: "Interview Help",
+                        amount: 284850,
                         currency: "INR"
                     }
                 }]
@@ -1032,9 +1081,46 @@ module.exports = function (app) {
             })
         })
 
-        // new USEER API'S...................
-    
-            // NORMAL USER SIGN-IN
+        app.post('/subscription-status_exp' , (req,res) => {
+            const subscription_id = req.body.subId
+                   // SUBSCRIPTION RAZORPAY CREDENTIALS
+                     var instance = new Razorpay({
+                           key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                           key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                     })
+
+            var subscriptionDATA = instance.subscriptions.fetch(subscription_id)
+            subscriptionDATA.then(meta => {
+                console.log('status & exp = ' + JSON.stringify(meta));
+                let start_date = new Date(meta.start_at*1000).toLocaleDateString("en-US")
+                let year = start_date.split('/')[2]
+                let month = start_date.split('/')[0]
+                let day = start_date.split('/')[1]
+
+                var finaldate = new Date(year, month, day);
+                let incresedDate = finaldate.setMonth(finaldate.getMonth() + 0);
+                let expirydate = new Date(incresedDate).toLocaleDateString("en-US")
+                
+                userLogincredential.update({
+                    'useremail': userProfile.emails[0].value
+                }, {
+                    $set: {
+                        'status': meta.status,
+                        'expireDate': expirydate
+                    }
+                }, function (err, data) {
+                    if (err) throw err;
+                    res.json(data)
+                })
+            }).catch(err => {
+                console.log(err)
+            })
+
+        })
+
+        // new USER API'S...................
+
+        // NORMAL USER SIGN-IN
         app.get('/login-user', (req, res) => {
             res.render('normalSignIn')
         })
@@ -1053,6 +1139,7 @@ module.exports = function (app) {
                 useremail: req.body.email,
             }, function (err, Logedindata) {
                 if (err) throw err;
+                console.log(Logedindata)
                 if(crypted == Logedindata.password){
                     userProfile = {
                         emails:[{value:req.body.email}]
@@ -1060,29 +1147,71 @@ module.exports = function (app) {
                     console.log('------ ' + userProfile)
                     if(Logedindata.subscriptions_id){
                         // SUBSCRIPTION RAZORPAY CREDENTIALS
-                        var instance = new Razorpay({
-                            key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                            key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            })
-                            // var instance = new Razorpay({
-                            //     key_id: 'rzp_test_SQS56XrzM6nFIo',
-                            //     key_secret: 'vk6qMo4dIp37CRvd0lAflmKu'
-                            // })
+                        const today = new Date();
+                        const yyyy = today.getFullYear();
+                        let mm = today.getMonth() + 1; // Months start at 0!
+                        let dd = today.getDate();
+                        if (dd < 10) dd = '0' + dd;
+                        if (mm < 10) mm = '0' + mm;
+                        const formattedToday =  mm + '/' + dd + '/' + yyyy;
+                        var expirydate = Date.parse(Logedindata.expireDate);
+                        var todaydate = Date.parse(formattedToday.toString());
+                        if (expirydate >= todaydate) {
+                            if(Logedindata.status == 'active'){
+                                console.log('OLD USER WITH SUBSCRIPTIOIN')
+                                res.redirect('/categories')
+                            }else{
+                                console.log('OLD USER WITH EXPIRED/UNACTIVE SUBSCRIPTIOIN')
+                                res.redirect('/subscriptionPlan')
+                            }
+                         }else{
+                        // SUBSCRIPTION RAZORPAY CREDENTIALS
+                         var instance = new Razorpay({
+                             key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                             key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                         })
 
-                            var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
-                            subscriptionDATA.then(meta => {
-                                // console.log('SUB Data = ' + JSON.stringify(meta));
-                                if (meta.status == 'active') {
-                                    sessions = 'data'
-                                    console.log('OLD USER WITH SUBSCRIPTIOIN')
+                        var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
+                        subscriptionDATA.then(meta => {
+                            // console.log('SUB Data = ' + JSON.stringify(meta));
+                            if (meta.status == 'active') {
+                                console.log('OLD USER WITH and expired date SUBSCRIPTIOIN')
+                                const d = new Date();
+                                let month = d.getMonth();
+                                let year = d.getFullYear();
+                                let day = d.getDate();
+                                var finaldate = new Date(year, month, day);
+                                let incresedDate = finaldate.setMonth(finaldate.getMonth() + 0);
+                                let expirydate = new Date(incresedDate).toLocaleDateString("en-US")
+                                userLogincredential.update({
+                                    'useremail': req.body.email
+                                }, {
+                                    $set: {
+                                        'status': 'active',
+                                        'expireDate': expirydate
+                                    }
+                                }, function (err, data) {
+                                    if (err) throw err;
                                     res.redirect('/categories')
-                                } else {
-                                    console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                                })
+                            } else {
+                                console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                                userLogincredential.update({
+                                    'useremail': req.body.email
+                                }, {
+                                    $set: {
+                                        'status': 'non-active',
+                                    }
+                                }, function (err, data) {
+                                    if (err) throw err;
                                     res.redirect('/subscriptionPlan')
-                                }
-                            }).catch(err => {
-                                console.log(err)
-                            })
+                                })
+                            }
+                        }).catch(err => {
+                            console.log(err)
+                        })
+
+                         }
                         }else{
                             console.log('OLD USER WITH NULL SUBSCRIPTIOIN DETAILS')
                             res.redirect('/subscriptionPlan')  
@@ -1094,13 +1223,11 @@ module.exports = function (app) {
         })
       
         app.post('/register-user',(req,res) =>{
-            console.log(req.body)
             const pass = req.body.password
             var key = "123|a123123123123123@&";
             var cipher = crypto.createCipher('aes-256-cbc', key);
             var crypted = cipher.update(pass, 'utf-8', 'hex');
             crypted += cipher.final('hex');
-            console.log(crypted)
 
             new userLogincredential({
                 username: req.body.name,
@@ -1108,7 +1235,9 @@ module.exports = function (app) {
                 password:crypted,
                 created_at: new Date(),
                 subscriptions_id: '',
-                plan_id: ''
+                plan_id: '',
+                status:'',
+                expireDate:''
             }).save(function (err, data) {
                 if (err) {
                     res.sendStatus(400);
@@ -1120,25 +1249,26 @@ module.exports = function (app) {
 
         // Read all catetories & HOME PAGE for REGULAR
         app.get('/categories', (req, res) => {
+            const userEmail =  userProfile.emails[0].value
             userLogincredential.count({
-                useremail: userProfile.emails[0].value
+                useremail:userEmail
             }, (err, Rolecounter) => {
                 if (err) throw err;
                 if (Rolecounter > 0) {
                     userLogincredential.findOne({
-                        useremail: userProfile.emails[0].value
+                        useremail:userEmail
                     }, function (err, Logedindata) {
                         if (err) throw err;
-                            // SUBSCRIPTION RAZORPAY CREDENTIALS
-                            var instance = new Razorpay({
-                                key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                                key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                            }) 
+                     var instance = new Razorpay({
+                         key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                         key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                     }) 
+  
                     var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
                     subscriptionDATA.then(meta => {
                         console.log('SUB Data = ' + JSON.stringify(meta));
                         if (meta.status == 'active') {
-                            if (sessions) {
+                            if (userProfile) {
                                 Jobrole.find({}, (err, data) => {
                                     if (err) throw err;
                                     const tech_list = []
