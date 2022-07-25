@@ -1259,16 +1259,17 @@ module.exports = function (app) {
                         useremail:userEmail
                     }, function (err, Logedindata) {
                         if (err) throw err;
-                     var instance = new Razorpay({
-                         key_id: 'rzp_live_5V9Rr2HtEbDI2n',
-                         key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
-                     }) 
-  
-                    var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
-                    subscriptionDATA.then(meta => {
-                        console.log('SUB Data = ' + JSON.stringify(meta));
-                        if (meta.status == 'active') {
-                            if (userProfile) {
+                        const today = new Date();
+                        const yyyy = today.getFullYear();
+                        let mm = today.getMonth() + 1; // Months start at 0!
+                        let dd = today.getDate();
+                        if (dd < 10) dd = '0' + dd;
+                        if (mm < 10) mm = '0' + mm;
+                        const formattedToday =  mm + '/' + dd + '/' + yyyy;
+                        var expirydate = Date.parse(Logedindata.expireDate);
+                        var todaydate = Date.parse(formattedToday.toString());
+                        if (expirydate >= todaydate) {
+                            if(Logedindata.status == 'active'){
                                 Jobrole.find({}, (err, data) => {
                                     if (err) throw err;
                                     const tech_list = []
@@ -1282,17 +1283,43 @@ module.exports = function (app) {
                                         techList: tech_list
                                     })
                                 })
-                            } else {
-                                res.render('auth')
+                            }else{
+                                console.log('OLD USER WITH EXPIRED/UNACTIVE SUBSCRIPTIOIN')
+                                res.redirect('/subscriptionPlan')
                             }
-                        } else {
-                            console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
-                            res.redirect('/subscriptionPlan')
-                        }
-                    }).catch(err => {
-                        console.log(err)
-                    })
+                         }else{
+                        // SUBSCRIPTION RAZORPAY CREDENTIALS
+                         var instance = new Razorpay({
+                             key_id: 'rzp_live_5V9Rr2HtEbDI2n',
+                             key_secret: 'c9uW8hNPY33pmIWzeoSY0vZP'
+                         })        
+                        var subscriptionDATA = instance.subscriptions.fetch(Logedindata.subscriptions_id)
+                        subscriptionDATA.then(meta => {
+                            // console.log('SUB Data = ' + JSON.stringify(meta));
+                            if (meta.status == 'active') {
+                                console.log('OLD USER WITH and expired date SUBSCRIPTIOIN')
+                                Jobrole.find({}, (err, data) => {
+                                    if (err) throw err;
+                                    const tech_list = []
+                                    for (i = 0; i < data.length; i++) {
+                                        tech_list.push({
+                                            role: data[i].category_name,
+                                            role_id: data[i]._id
+                                        })
+                                    }
+                                       res.render('regular', {
+                                        techList: tech_list
+                                    })
+                                })
+                            } else {
+                                console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
+                                res.redirect('/subscriptionPlan')
+                            }
+                        }).catch(err => {
+                            console.log(err)
+                        })
 
+                         }
                 })
             }else{
                 res.render('auth')
