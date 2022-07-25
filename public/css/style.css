@@ -7160,7 +7160,7 @@ a:hover, a:focus, .btn:hover, .btn:focus, button:hover, button:focus {
 .price_tab .nav-item .nav-link_1 {
   margin: 0px;
   font: 600 16px "Poppins", sans-serif;
-  padding: 12px 30px;
+  padding: 9px 0px 16px 80px;
   display: inline-block;
   min-width: 193px;
   text-align: center;
