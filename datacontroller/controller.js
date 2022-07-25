@@ -1135,14 +1135,15 @@ module.exports = function (app) {
             var crypted = cipher.update(req.body.password, 'utf-8', 'hex');
             crypted += cipher.final('hex');
             console.log(crypted)
+            const userLogedinemail = (req.body.email).toLowerCase()
             userLogincredential.findOne({
-                useremail: req.body.email,
+                useremail: userLogedinemail,
             }, function (err, Logedindata) {
                 if (err) throw err;
                 console.log(Logedindata)
                 if(crypted == Logedindata.password){
                     userProfile = {
-                        emails:[{value:req.body.email}]
+                        emails:[{value:userLogedinemail}]
                     }
                     console.log('------ ' + userProfile)
                     if(Logedindata.subscriptions_id){
@@ -1184,7 +1185,7 @@ module.exports = function (app) {
                                 let incresedDate = finaldate.setMonth(finaldate.getMonth() + 0);
                                 let expirydate = new Date(incresedDate).toLocaleDateString("en-US")
                                 userLogincredential.update({
-                                    'useremail': req.body.email
+                                    'useremail': userLogedinemail
                                 }, {
                                     $set: {
                                         'status': 'active',
@@ -1197,7 +1198,7 @@ module.exports = function (app) {
                             } else {
                                 console.log('OLD USER WITHOUT SUBSCRIPTIOIN')
                                 userLogincredential.update({
-                                    'useremail': req.body.email
+                                    'useremail': userLogedinemail
                                 }, {
                                     $set: {
                                         'status': 'non-active',
@@ -1231,7 +1232,7 @@ module.exports = function (app) {
 
             new userLogincredential({
                 username: req.body.name,
-                useremail: req.body.email,
+                useremail: (req.body.email).toLowerCase(),
                 password:crypted,
                 created_at: new Date(),
                 subscriptions_id: '',
